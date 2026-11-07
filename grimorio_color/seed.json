@@ -1,0 +1,700 @@
+{
+  "version": 1,
+  "privateMode": true,
+  "activeCharacterId": "rowan",
+  "characters": [
+    {
+      "id": "rowan",
+      "name": "Rowan Vale",
+      "summary": "A ranger of the Ash Guard, raised between forge smoke and night watches. A scar crosses their left brow, and they are searching for a missing sibling in the pine forest.",
+      "history": "Rowan grew up at the edge of Vado Gris, where the forge never quite went cold. They learned to read metal before letters and joined the Ash Guard at sixteen to pay off the family debt. For years they covered the east wall at night, listening for anything moving under the pines.\n\nThe night of the fire, Rowan's younger sibling Mira went to find a lost child and did not come back. Rowan found only a brass buckle and a trail of ash leading into the woods. Since then they train with a discipline that unsettles the other guards and save every coin for the next search.",
+      "personality": "Direct, dry, and protective past the point of reason. Rowan distrusts anyone who has never been hungry, but cannot leave someone behind. They relax by carving wooden spoons and humming badly tuned tavern songs.",
+      "relationships": "Mira Vale, younger sibling, missing. Captain Ordo owes Rowan two lives and is a little afraid of them. Tomas the armorer keeps a stool by the forge and a bowl of broth every winter.",
+      "tags": [
+        "fantasy",
+        "ranger",
+        "ash guard"
+      ],
+      "palettes": {
+        "skin": [
+          {
+            "id": "rowan-skin-1",
+            "name": "Base skin",
+            "hex": "#c98d6b",
+            "role": "base",
+            "bodyPart": "Face & body",
+            "purpose": "Base skin",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-skin-2",
+            "name": "Warm shadow",
+            "hex": "#9a5f49",
+            "role": "shadow",
+            "bodyPart": "Face & body",
+            "purpose": "Warm shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-skin-3",
+            "name": "Key light",
+            "hex": "#e8b795",
+            "role": "light",
+            "bodyPart": "Face & body",
+            "purpose": "Key light",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-skin-4",
+            "name": "Blush",
+            "hex": "#b96a5e",
+            "role": "accent",
+            "bodyPart": "Cheeks",
+            "purpose": "Blush",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "hair": [
+          {
+            "id": "rowan-hair-1",
+            "name": "Auburn base",
+            "hex": "#5b3a26",
+            "role": "base",
+            "bodyPart": "Hair",
+            "purpose": "Auburn base",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-hair-2",
+            "name": "Root shadow",
+            "hex": "#3a2418",
+            "role": "shadow",
+            "bodyPart": "Hair",
+            "purpose": "Root shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-hair-3",
+            "name": "Sun catch",
+            "hex": "#8a5a35",
+            "role": "light",
+            "bodyPart": "Hair",
+            "purpose": "Sun catch",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-hair-4",
+            "name": "Early grey",
+            "hex": "#8d8078",
+            "role": "detail",
+            "bodyPart": "Temples",
+            "purpose": "Early grey",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "eyes": [
+          {
+            "id": "rowan-eyes-1",
+            "name": "Green iris",
+            "hex": "#4f7a4a",
+            "role": "base",
+            "bodyPart": "Eyes",
+            "purpose": "Green iris",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-eyes-2",
+            "name": "Iris shadow",
+            "hex": "#2f4a33",
+            "role": "shadow",
+            "bodyPart": "Eyes",
+            "purpose": "Iris shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-eyes-3",
+            "name": "Catchlight",
+            "hex": "#cfe0b8",
+            "role": "light",
+            "bodyPart": "Eyes",
+            "purpose": "Catchlight",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "outfit": [
+          {
+            "id": "rowan-outfit-1",
+            "name": "Leather coat",
+            "hex": "#6b432e",
+            "role": "base",
+            "bodyPart": "Torso & legs",
+            "purpose": "Leather coat base",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-outfit-2",
+            "name": "Coat shadow",
+            "hex": "#452a1d",
+            "role": "shadow",
+            "bodyPart": "Torso & legs",
+            "purpose": "Coat shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-outfit-3",
+            "name": "Stitching",
+            "hex": "#c8a06a",
+            "role": "detail",
+            "bodyPart": "Torso & legs",
+            "purpose": "Stitching",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-outfit-4",
+            "name": "Warm lining",
+            "hex": "#8a6a4a",
+            "role": "light",
+            "bodyPart": "Torso & legs",
+            "purpose": "Warm lining",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "armor": [
+          {
+            "id": "rowan-armor-1",
+            "name": "Steel pauldron",
+            "hex": "#8a95a3",
+            "role": "base",
+            "bodyPart": "Left shoulder",
+            "purpose": "Steel pauldron base",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-armor-2",
+            "name": "Steel shadow",
+            "hex": "#4a5563",
+            "role": "shadow",
+            "bodyPart": "Left shoulder",
+            "purpose": "Steel shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-armor-3",
+            "name": "Edge highlight",
+            "hex": "#d8e0e8",
+            "role": "light",
+            "bodyPart": "Left shoulder",
+            "purpose": "Edge highlight",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "accessories": [
+          {
+            "id": "rowan-acc-1",
+            "name": "Compass brass",
+            "hex": "#b08a4a",
+            "role": "accent",
+            "bodyPart": "Neck",
+            "purpose": "Compass brass",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-acc-2",
+            "name": "Leather cord",
+            "hex": "#4a3022",
+            "role": "detail",
+            "bodyPart": "Neck",
+            "purpose": "Leather cord",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-acc-3",
+            "name": "Compass glass",
+            "hex": "#7aa0a8",
+            "role": "light",
+            "bodyPart": "Neck",
+            "purpose": "Compass glass",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "intimate": [],
+        "scars": [
+          {
+            "id": "rowan-scar-1",
+            "name": "Old brow scar",
+            "hex": "#d8a58e",
+            "role": "base",
+            "bodyPart": "Left brow",
+            "purpose": "Old scar",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-scar-2",
+            "name": "Tension line",
+            "hex": "#8a5a4a",
+            "role": "detail",
+            "bodyPart": "Left brow",
+            "purpose": "Tension line",
+            "opacity": 100,
+            "note": ""
+          }
+        ]
+      },
+      "recipe": [
+        {
+          "id": "rowan-layer-1",
+          "name": "LINE",
+          "blend": "normal",
+          "opacity": 100,
+          "purpose": "Clean lineart"
+        },
+        {
+          "id": "rowan-layer-2",
+          "name": "BASE",
+          "blend": "normal",
+          "opacity": 100,
+          "purpose": "Flat colors"
+        },
+        {
+          "id": "rowan-layer-3",
+          "name": "SHADOW",
+          "blend": "multiply",
+          "opacity": 45,
+          "purpose": "General shadow"
+        },
+        {
+          "id": "rowan-layer-4",
+          "name": "AO",
+          "blend": "multiply",
+          "opacity": 25,
+          "purpose": "Occlusion in creases"
+        },
+        {
+          "id": "rowan-layer-5",
+          "name": "LIGHT",
+          "blend": "add",
+          "opacity": 30,
+          "purpose": "Main light"
+        },
+        {
+          "id": "rowan-layer-6",
+          "name": "GLOW",
+          "blend": "add",
+          "opacity": 15,
+          "purpose": "Glow"
+        },
+        {
+          "id": "rowan-layer-7",
+          "name": "FX",
+          "blend": "overlay",
+          "opacity": 20,
+          "purpose": "Texture and adjustment"
+        }
+      ],
+      "environment": {
+        "name": "Pine forest at dusk",
+        "time": "Dusk",
+        "weather": "Light fog",
+        "keyLight": "#ffb36b",
+        "shadowTint": "#3a2a4d",
+        "bounce": "#7a4a2a",
+        "mood": "Warm, damp, backlit",
+        "palette": [
+          {
+            "id": "rowan-env-1",
+            "name": "Mauve sky",
+            "hex": "#6f5a7a",
+            "role": "base",
+            "bodyPart": "Environment",
+            "purpose": "Sky base",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-env-2",
+            "name": "Filtered sun",
+            "hex": "#ffb36b",
+            "role": "light",
+            "bodyPart": "Environment",
+            "purpose": "Key light",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-env-3",
+            "name": "Moss bounce",
+            "hex": "#6f7f5f",
+            "role": "accent",
+            "bodyPart": "Environment",
+            "purpose": "Bounce from the ground",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "rowan-env-4",
+            "name": "Wet ash",
+            "hex": "#7d7468",
+            "role": "shadow",
+            "bodyPart": "Environment",
+            "purpose": "Shadow ground",
+            "opacity": 100,
+            "note": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "mika",
+      "name": "Mika Sato",
+      "summary": "A night courier in the lower city. Cool skin, black curls, amber eyes, a silver chain, and a scar across one knuckle. Always chasing the next delivery.",
+      "history": "Mika grew up in the stacked apartments behind the night market, running packages for anyone who paid in cash. They know every service corridor and every broken camera in the lower city. The courier jacket is the only thing they never pawn.\n\nA delivery went wrong three winters ago; Mika came back with a scarred knuckle and a rule: never open the package. They still take the jobs nobody else will, as long as the price is right.",
+      "personality": "Quick, guarded, and impossible to bore. Mika jokes when nervous and disappears when thanked. They keep a mental map of every exit in a room.",
+      "relationships": "Rin, a dispatcher who owes them a favor. The Silver Kites gang tolerates them. Their mother still lives in the lower city and thinks Mika works days.",
+      "tags": [
+        "urban",
+        "courier",
+        "night"
+      ],
+      "palettes": {
+        "skin": [
+          {
+            "id": "mika-skin-1",
+            "name": "Base skin",
+            "hex": "#6f4c44",
+            "role": "base",
+            "bodyPart": "Face & body",
+            "purpose": "Cool deep skin",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-skin-2",
+            "name": "Cool shadow",
+            "hex": "#4a2f2c",
+            "role": "shadow",
+            "bodyPart": "Face & body",
+            "purpose": "Cool shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-skin-3",
+            "name": "Neon rim",
+            "hex": "#9a6f62",
+            "role": "light",
+            "bodyPart": "Face & body",
+            "purpose": "Neon rim light",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-skin-4",
+            "name": "Cold blush",
+            "hex": "#8a4f52",
+            "role": "accent",
+            "bodyPart": "Cheeks",
+            "purpose": "Cold blush",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "hair": [
+          {
+            "id": "mika-hair-1",
+            "name": "Black curls",
+            "hex": "#1f1b1a",
+            "role": "base",
+            "bodyPart": "Hair",
+            "purpose": "Black curls",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-hair-2",
+            "name": "Deep shadow",
+            "hex": "#0f0d0c",
+            "role": "shadow",
+            "bodyPart": "Hair",
+            "purpose": "Deep shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-hair-3",
+            "name": "Streetlight",
+            "hex": "#3a3330",
+            "role": "light",
+            "bodyPart": "Hair",
+            "purpose": "Streetlight",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-hair-4",
+            "name": "Soft grey",
+            "hex": "#5a504a",
+            "role": "detail",
+            "bodyPart": "Temples",
+            "purpose": "Soft grey",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "eyes": [
+          {
+            "id": "mika-eyes-1",
+            "name": "Amber iris",
+            "hex": "#c98a3a",
+            "role": "base",
+            "bodyPart": "Eyes",
+            "purpose": "Amber iris",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-eyes-2",
+            "name": "Iris shadow",
+            "hex": "#7a4a1d",
+            "role": "shadow",
+            "bodyPart": "Eyes",
+            "purpose": "Iris shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-eyes-3",
+            "name": "Catchlight",
+            "hex": "#f0d8a8",
+            "role": "light",
+            "bodyPart": "Eyes",
+            "purpose": "Catchlight",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "outfit": [
+          {
+            "id": "mika-outfit-1",
+            "name": "Denim jacket",
+            "hex": "#2f4a5a",
+            "role": "base",
+            "bodyPart": "Torso & legs",
+            "purpose": "Denim jacket",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-outfit-2",
+            "name": "Denim shadow",
+            "hex": "#1d2f3a",
+            "role": "shadow",
+            "bodyPart": "Torso & legs",
+            "purpose": "Denim shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-outfit-3",
+            "name": "Stitching",
+            "hex": "#c8a06a",
+            "role": "detail",
+            "bodyPart": "Torso & legs",
+            "purpose": "Stitching",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-outfit-4",
+            "name": "Off-white tee",
+            "hex": "#d8d0c0",
+            "role": "light",
+            "bodyPart": "Torso",
+            "purpose": "Off-white tee",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "armor": [],
+        "accessories": [
+          {
+            "id": "mika-acc-1",
+            "name": "Silver chain",
+            "hex": "#b8c0c8",
+            "role": "light",
+            "bodyPart": "Hands & neck",
+            "purpose": "Silver chain",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-acc-2",
+            "name": "Silver shadow",
+            "hex": "#6a7078",
+            "role": "shadow",
+            "bodyPart": "Hands & neck",
+            "purpose": "Silver shadow",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-acc-3",
+            "name": "Brass ring",
+            "hex": "#d8b04a",
+            "role": "accent",
+            "bodyPart": "Right hand",
+            "purpose": "Brass ring",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "intimate": [],
+        "scars": [
+          {
+            "id": "mika-scar-1",
+            "name": "Old knuckle cut",
+            "hex": "#8a6156",
+            "role": "base",
+            "bodyPart": "Right knuckle",
+            "purpose": "Old cut",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-scar-2",
+            "name": "Faded edge",
+            "hex": "#b58a7a",
+            "role": "detail",
+            "bodyPart": "Right knuckle",
+            "purpose": "Faded edge",
+            "opacity": 100,
+            "note": ""
+          }
+        ]
+      },
+      "recipe": [
+        {
+          "id": "mika-layer-1",
+          "name": "LINE",
+          "blend": "normal",
+          "opacity": 100,
+          "purpose": "Blue-black lineart"
+        },
+        {
+          "id": "mika-layer-2",
+          "name": "BASE",
+          "blend": "normal",
+          "opacity": 100,
+          "purpose": "Flat colors"
+        },
+        {
+          "id": "mika-layer-3",
+          "name": "SHADOW",
+          "blend": "multiply",
+          "opacity": 50,
+          "purpose": "Cold shadow"
+        },
+        {
+          "id": "mika-layer-4",
+          "name": "AO",
+          "blend": "multiply",
+          "opacity": 30,
+          "purpose": "Occlusion under the jacket"
+        },
+        {
+          "id": "mika-layer-5",
+          "name": "LIGHT",
+          "blend": "add",
+          "opacity": 25,
+          "purpose": "Neon rim light"
+        },
+        {
+          "id": "mika-layer-6",
+          "name": "GLOW",
+          "blend": "add",
+          "opacity": 20,
+          "purpose": "Wet reflections"
+        },
+        {
+          "id": "mika-layer-7",
+          "name": "FX",
+          "blend": "overlay",
+          "opacity": 18,
+          "purpose": "Rain and grain"
+        }
+      ],
+      "environment": {
+        "name": "Neon alley at 2 a.m.",
+        "time": "Night",
+        "weather": "Rain",
+        "keyLight": "#ff5c8a",
+        "shadowTint": "#1a1a3a",
+        "bounce": "#2a6a8a",
+        "mood": "Cold neon, wet asphalt",
+        "palette": [
+          {
+            "id": "mika-env-1",
+            "name": "Neon pink",
+            "hex": "#ff5c8a",
+            "role": "light",
+            "bodyPart": "Environment",
+            "purpose": "Main neon",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-env-2",
+            "name": "Sign teal",
+            "hex": "#4ad8c8",
+            "role": "accent",
+            "bodyPart": "Environment",
+            "purpose": "Secondary sign",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-env-3",
+            "name": "Asphalt",
+            "hex": "#2a2d3a",
+            "role": "shadow",
+            "bodyPart": "Environment",
+            "purpose": "Ground base",
+            "opacity": 100,
+            "note": ""
+          },
+          {
+            "id": "mika-env-4",
+            "name": "Puddle",
+            "hex": "#6a7a9a",
+            "role": "light",
+            "bodyPart": "Environment",
+            "purpose": "Reflection",
+            "opacity": 100,
+            "note": ""
+          }
+        ]
+      }
+    }
+  ]
+}

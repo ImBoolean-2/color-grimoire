@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=grimorio_color
+X-Krita-Manual=Manual.html
+Name=Color Grimoire
+Name[es]=Grimorio de Color
+Comment=Character color sheets, layer recipes and environment palettes inside Krita
+Comment[es]=Fichas de color, recetas de capas y ambientes para tus OCs dentro de Krita
