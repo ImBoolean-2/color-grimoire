@@ -15,6 +15,8 @@ Thanks for helping Color Grimoire. The most useful contribution right now is a *
 
 The plugin loads translations from `grimorio_color/translations/` (bundled) and from the user's `translations/` folder next to the JSON. User files override bundled files, so a translator can test without rebuilding the plugin.
 
+See [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md) for the loader details.
+
 ### Test a translation locally
 
 Copy your `<code>.json` to the user folder:
@@ -27,6 +29,8 @@ Copy your `<code>.json` to the user folder:
 Then use `⋯ → Language → Reload translations` (or restart Krita). If the language does not appear, check the JSON `code`, `name` and the folder.
 
 ## Code contributions
+
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the environment, test matrix and code rules.
 
 - The plugin is pure Python and supports Krita 5.3 (PyQt5) and Krita 6.0 (PyQt6). Keep the Qt compatibility layer in `qt_compat.py`.
 - Run the tests before opening a pull request:

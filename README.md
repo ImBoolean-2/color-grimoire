@@ -126,6 +126,18 @@ flatpak run --env=QT_QPA_PLATFORM=offscreen --env=QT_QPA_PLATFORMTHEME= \
 
 The real API test runs on Krita 6.0.4.1 and verifies the layer group order, all blend-mode IDs, the opacities and the lighting rig. The same API calls are covered by the Krita 5.3 PyQt5 model/UI tests. The UI tests render screenshots to `~/.cache/grimorio-shots/`.
 
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Data model](docs/DATA-MODEL.md)
+- [Development and testing](docs/DEVELOPMENT.md)
+- [Releasing](docs/RELEASING.md)
+- [Translations](docs/TRANSLATIONS.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Roadmap](docs/ROADMAP.md)
+
+The end-user manual is [`grimorio_color/Manual.html`](grimorio_color/Manual.html).
+
 ## Known limitations / roadmap
 
 - **Create layers** builds the group, the layers, the blend modes and the opacities, but does not paint. The layers are intentionally blank. The stack is LINE on top and FX at the bottom.
