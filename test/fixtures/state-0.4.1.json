@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "privateMode": true,
+  "activeCharacterId": "oc-rowan",
+  "characters": [
+    {
+      "id": "oc-rowan",
+      "name": "Rowan Vale",
+      "summary": "Explorador del bosque.",
+      "history": "",
+      "personality": "",
+      "relationships": "",
+      "tags": ["bosque"],
+      "referenceImage": "",
+      "zoneExamples": {},
+      "palettes": {
+        "skin": [
+          {
+            "id": "color-rowan-skin",
+            "name": "Piel base",
+            "hex": "#c98d6b",
+            "role": "base",
+            "bodyPart": "Cara y cuerpo",
+            "purpose": "Plano de piel",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "hair": [
+          {
+            "id": "color-rowan-hair",
+            "name": "Pelo castaño",
+            "hex": "#5b3a26",
+            "role": "base",
+            "bodyPart": "Pelo",
+            "purpose": "Plano de pelo",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "eyes": [
+          {
+            "id": "color-rowan-eyes",
+            "name": "Ojos verdes",
+            "hex": "#4a6b45",
+            "role": "base",
+            "bodyPart": "Ojos",
+            "purpose": "Iris",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "outfit": [],
+        "armor": [],
+        "accessories": [],
+        "intimate": [],
+        "scars": []
+      },
+      "recipe": [
+        {"id": "layer-rowan-line", "name": "LINE", "blend": "normal", "opacity": 100, "purpose": "Lineart limpio"},
+        {"id": "layer-rowan-base", "name": "BASE", "blend": "normal", "opacity": 100, "purpose": "Colores planos"},
+        {"id": "layer-rowan-shadow", "name": "SHADOW", "blend": "multiply", "opacity": 45, "purpose": "Sombra general"},
+        {"id": "layer-rowan-ao", "name": "AO", "blend": "multiply", "opacity": 25, "purpose": "Oclusión en grietas"},
+        {"id": "layer-rowan-light", "name": "LIGHT", "blend": "add", "opacity": 30, "purpose": "Luz principal"},
+        {"id": "layer-rowan-glow", "name": "GLOW", "blend": "add", "opacity": 15, "purpose": "Brillo"},
+        {"id": "layer-rowan-fx", "name": "FX", "blend": "overlay", "opacity": 20, "purpose": "Textura / ajuste"}
+      ],
+      "environment": {
+        "name": "Bosque al atardecer",
+        "time": "Atardecer",
+        "weather": "Despejado",
+        "keyLight": "#ff9a5c",
+        "shadowTint": "#3a2a5c",
+        "bounce": "#8a4a3a",
+        "mood": "Cálido en luz, frío en sombra",
+        "palette": []
+      }
+    },
+    {
+      "id": "oc-kai",
+      "name": "Kai",
+      "palettes": {
+        "skin": [],
+        "hair": [],
+        "eyes": [],
+        "outfit": [],
+        "armor": [],
+        "accessories": [],
+        "intimate": [],
+        "scars": []
+      },
+      "recipe": [],
+      "environment": {
+        "name": "",
+        "time": "",
+        "weather": "",
+        "keyLight": "#ffb36b",
+        "shadowTint": "#3a2a4d",
+        "bounce": "#7a4a2a",
+        "mood": "",
+        "palette": []
+      }
+    }
+  ]
+}

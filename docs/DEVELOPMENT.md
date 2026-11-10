@@ -1,5 +1,7 @@
 # Development and testing
 
+Current version: **0.7.0** (data schema **v2**).
+
 ## Tested environment
 
 - Linux (Fedora KDE Plasma).
@@ -28,7 +30,7 @@ The public repository is the plugin. The personal web companion and earlier prot
 python3 -m unittest test_model.py test_i18n.py -v
 ```
 
-Covers normalization, CRUD, GPL, JSON, images, color, lighting, bundled/user translations and the template.
+Covers normalization, CRUD, GPL, JSON, images, color, lighting, schema v2, project kinds, zone presets and editor, palette library, multiple environments, v1→v2 migration and backups, the Loomis `head` contract, bundled/user translations and the template.
 
 ### Bridge and entry point with a fake Krita (Flatpak)
 
@@ -95,19 +97,19 @@ export XDG_SESSION_TYPE=wayland
 python3 -m http.server 8765
 ```
 
-Open `http://127.0.0.1:8765/test/smoke.html`; expected **43 PASS**. Release screenshots are committed under `screenshots/`; maintainers regenerate them with a local script (not part of the repository).
+Open `http://127.0.0.1:8765/test/smoke.html`; expected **140 PASS**. Release screenshots are committed under `screenshots/`; maintainers regenerate them with a local script (not part of the repository).
 
 ### Matrix
 
 | What | Command | Expected |
 |---|---|---|
-| Model + i18n | `python3 -m unittest test_model.py test_i18n.py` | 19 OK |
+| Model + i18n | `python3 -m unittest test_model.py test_i18n.py` | 44 + 4 OK |
 | Bridge | `flatpak run --command=python3 ... test_bridge.py` | 6 OK |
 | UI PyQt5 | `GRIMORIO_LANG=es flatpak run ... test_ui_offscreen.py` | UI OK |
 | UI PyQt6 | `GRIMORIO_LANG=en .venv/bin/python test_ui_offscreen.py` | UI OK |
 | Krita 5.3 real | `kritarunner` (Krita closed) | STACK / LIGHT_GROUP |
 | Krita 6 real | AppImage + KWin | STACK / LIGHT_GROUP |
-| Web | `test/smoke.html` | 43 PASS |
+| Web | `test/smoke.html` | 140 PASS |
 
 ## Code rules
 

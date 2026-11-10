@@ -17,13 +17,25 @@
 </head>
 <body>
 <h1>Color Grimoire</h1>
-<p class="muted">Version 0.4.1 · Krita 5.3 / 6.0</p>
+<p class="muted">Version 0.7.0 · Krita 5.3 / 6.0</p>
 
-<p>Color Grimoire is a Krita docker for keeping each OC's colors, body-part notes, layer recipe and environment palette in one place. Click a swatch to set the foreground color; right-click to set the background.</p>
+<p>Color Grimoire is a Krita docker for keeping the colors of each character, scene or prop, the element notes, the layer recipe and the environment palette in one place. Click a swatch to set the foreground color; right-click to set the background.</p>
+
+<h2>Updating from 0.4.1</h2>
+<div class="box">
+  <ol>
+    <li>Close Krita. Optionally copy <code>grimorio.json</code> and the <code>images/</code> folder from the data folder.</li>
+    <li>Install <code>grimorio_color-0.7.0.zip</code> with <b>Tools → Scripts → Import Python Plugins</b>, then restart Krita.</li>
+    <li>Open the docker. Your 0.4.1 file is converted on first load; the plugin writes <code>grimorio.json.v1.bak</code> next to it.</li>
+    <li>Open a project and check palettes, recipe, environment and images.</li>
+    <li>If you use Loomis Head Guide: update both plugins, save in Loomis first, then in Grimoire.</li>
+  </ol>
+  <p>Full step-by-step guide (English and Spanish): <a href="../MIGRATION-0.4.1-TO-0.7.0.md">../MIGRATION-0.4.1-TO-0.7.0.md</a> (in the release folder or the repository).</p>
+</div>
 
 <h2>Install</h2>
 <ol>
-  <li>Download <code>grimorio_color-0.1.0.zip</code>.</li>
+  <li>Download <code>grimorio_color-0.7.0.zip</code>.</li>
   <li>In Krita: <b>Tools → Scripts → Import Python Plugins</b>, select the ZIP.</li>
   <li>Restart Krita.</li>
   <li><b>Settings → Configure Krita → Python Plugin Manager</b>: enable <b>Color Grimoire</b>.</li>
@@ -34,7 +46,7 @@
 
 <h2>Optional personalization</h2>
 <ul>
-  <li><b>OC photo</b>: use <b>Add photo</b> in the sheet hero. It is copied to <code>images/</code> next to the JSON and shown in the hero. Change, remove or open it with the buttons under the photo.</li>
+  <li><b>Project photo</b>: use <b>Add photo</b> in the sheet hero. It is copied to <code>images/</code> next to the JSON and shown in the hero. Change, remove or open it with the buttons under the photo.</li>
   <li><b>Zone example</b>: the small <b>▣</b> button in each zone header adds a reference crop (hair base/shadow, painted skin, etc.). It appears in the zone with a <b>Remove example</b> button.</li>
   <li><b>Color ramp</b>: every zone with base, shadow and light colors shows an automatic shadow → base → light strip. It is a visual guide, not a replacement for the swatches.</li>
 </ul>
@@ -42,11 +54,19 @@
 
 <h2>First steps</h2>
 <ul>
-  <li>Pick an OC in the dropdown, or create one with <b>New OC</b>.</li>
-  <li>The <b>Sheet</b> tab holds the summary, history, personality and relationships.</li>
-  <li>The <b>Palettes</b> tab has eight zones: skin, hair, eyes, clothing, armor, accessories, private and marks/scars.</li>
-  <li>Each color stores a name, HEX, role, body part, purpose, opacity and note.</li>
+  <li>Pick a project in the dropdown, or create one with <b>New project</b>. Choose <b>Character</b>, <b>Scene</b> or <b>Prop</b>: each type starts with its own zones and layer recipe.</li>
+  <li>The <b>Sheet</b> tab holds the summary, history, personality and relationships for characters. Scenes and props show the summary and the active environment instead.</li>
+  <li>The <b>Palettes</b> tab shows the project zones. A character starts with skin, hair, eyes, clothing, armor, accessories, private and marks/scars; scenes and props get their own sets.</li>
+  <li>Each color stores a name, HEX, role, body part or element, purpose, opacity and note.</li>
+  <li>The <b>Library</b> tab stores reusable palettes you can import into any zone.</li>
 </ul>
+
+<h2>Project types and zones</h2>
+<p><b>Type</b> changes the starter zones and recipe: <b>Character</b> (8 zones), <b>Scene</b> (8 zones: sky, foliage, terrain, water, architecture, props, FX, light) and <b>Prop</b> (5 zones). Changing the type keeps the current palettes as hidden extra zones; nothing is deleted. The sheet and print view adapt to the type: characters show history, personality and relationships; scenes and props show a summary and the active environment.</p>
+<p>Use <b>Edit zones</b> to add a zone, rename its label or element, reorder it, mark it private or delete it. The zone key stays stable. Deleting a zone keeps its colors as a hidden extra, so they still appear in the <code>.gpl</code> and the color counts.</p>
+
+<h2>Palette library</h2>
+<p>The <b>Library</b> tab holds reusable palettes. Use <b>Create from zone</b> to save a zone as a library palette; use <b>Import</b> in any zone to copy it there with new ids. Rename or delete library palettes from the same tab. Palettes are copied, not linked, so editing one project never changes another.</p>
 
 <h2>Colors</h2>
 <ul>
@@ -67,6 +87,7 @@
 
 <h2>Environment</h2>
 <p>The <b>Environment</b> tab stores the scene name, time, weather, mood, key light, shadow tint, bounce color and an environment palette. Use it as the lighting recipe for the scene.</p>
+<p>A project can hold <b>several environments</b> (day, sunset, night…). Add, duplicate, switch or delete them in the Environment tab; the active one drives the scene preview, the lighting rig, the sheet and the print view. The old single <code>environment</code> field stays as a mirror for older readers.</p>
 
 <h2>Scene preview and lighting rig</h2>
 <p><b>Scene preview</b> shows the key skin, hair and eye colors tinted by the scene's key light, shadow and bounce. Click a chip to use that color.</p>
@@ -74,7 +95,7 @@
 <p>Save the environment before creating the lights: the rig uses the saved values, not the unsaved form.</p>
 
 <h2>Color Guard</h2>
-<p>Enable <b>Color Guard</b> in the footer to compare the current foreground color with the active OC's palette. It shows the nearest swatch and the ΔE; if the color is off-palette, use <b>Snap</b> to set the exact palette color. The private zone is skipped while private mode is on. The ΔE threshold is a guide, not an absolute color-management check.</p>
+<p>Enable <b>Color Guard</b> in the footer to compare the current foreground color with the active project's palette. It shows the nearest swatch and the ΔE; if the color is off-palette, use <b>Snap</b> to set the exact palette color. The private zone is skipped while private mode is on. The ΔE threshold is a guide, not an absolute color-management check.</p>
 
 <h2>Web companion</h2>
 <p>The <b>web</b> button in the header (or <b>⋯ → Open web Grimoire</b>) opens the web app in your default browser. The default target is <code>~/proyectos/grimorio-color/index.html</code>; use <b>⋯ → Set web Grimoire…</b> to set a local path, an <code>http(s)://</code> URL or a <code>file://</code> URL.</p>
@@ -82,6 +103,7 @@
 
 <h2>JSON and backup</h2>
 <p>Everything is stored in one JSON file. The menu <b>⋯ → Export JSON…</b> makes a backup; <b>Import JSON…</b> restores one. <b>Open data folder</b> shows the file.</p>
+<p>Updating from 0.4.1 is automatic: the first load creates <code>grimorio.json.v1.bak</code> (or <code>grimorio.json.v1-&lt;date&gt;.bak</code> if the standard backup was already old) and converts the file to the new format. Keep that backup until you have checked your projects. Downgrades are not supported.</p>
 <ul>
   <li>Linux Flatpak: <code>~/.var/app/org.kde.krita/data/krita/grimorio-color/grimorio.json</code></li>
   <li>Linux native: <code>~/.local/share/krita/grimorio-color/grimorio.json</code></li>
@@ -114,17 +136,22 @@
 
 <hr>
 <h2>Español</h2>
-<p><b>Color Grimoire</b> es un docker de Krita para guardar los colores de cada OC, la parte del cuerpo, para qué sirve cada color, su opacidad, la receta de capas y la paleta del ambiente. Clic = color de primer plano; clic derecho = fondo.</p>
+<p><b>Color Grimoire</b> es un docker de Krita para guardar los colores de cada personaje, escenario o prop, la parte del cuerpo o elemento, para qué sirve cada color, su opacidad, la receta de capas y la paleta del ambiente. Clic = color de primer plano; clic derecho = fondo.</p>
 <ul>
+  <li><b>Tipos de proyecto</b>: personaje, escenario y prop, con zonas y receta iniciales propias.</li>
+  <li><b>Editor de zonas</b>: añadir, renombrar, reordenar, marcar privada y eliminar; al eliminar, los colores se conservan como extra oculto.</li>
+  <li><b>Biblioteca de paletas</b>: guarda una zona y vuelve a importarla en otro proyecto por copia.</li>
+  <li><b>Varios ambientes</b> por proyecto, con uno activo; la ficha y la impresión se adaptan al tipo.</li>
+  <li><b>Migración automática</b> desde 0.4.1 con <code>grimorio.json.v1.bak</code>; guía completa en <code>MIGRATION-0.4.1-TO-0.7.0.md</code>.</li>
   <li><b>Botón web</b>: abre el Grimorio web en el navegador; ruta local o URL configurable.</li>
-  <li><b>Foto opcional del OC</b>: se copia a <code>images/</code> y se muestra en la ficha.</li>
+  <li><b>Foto opcional del proyecto</b>: se copia a <code>images/</code> y se muestra en la ficha.</li>
   <li><b>Ejemplo opcional por zona</b>: botón <b>▣</b> para añadir un recorte de referencia.</li>
   <li><b>Rampas de color</b>: cada zona muestra sombra → base → luz.</li>
   <li><b>Traducciones propias</b>: JSON en <code>translations/</code>; el menú crea la plantilla, abre la carpeta y recarga.</li>
   <li><b>Vista de escena</b>: los colores clave teñidos por la luz, la sombra y el rebote del ambiente.</li>
   <li><b>Crear luces en Krita</b>: grupo de capas de relleno SHADOW/AO/LIGHT/GLOW/BOUNCE con los colores del ambiente.</li>
-  <li><b>Color Guard</b>: compara el color actual con la paleta del OC, muestra el más cercano y el ΔE, y permite corregirlo con <b>Snap</b>.</li>
-  <li>Instala el ZIP con <b>Tools → Scripts → Import Python Plugins</b>, reinicia Krita, actívalo en <b>Settings → Configure Krita → Python Plugin Manager</b> y reinicia otra vez.</li>
+  <li><b>Color Guard</b>: compara el color actual con la paleta del proyecto, muestra el más cercano y el ΔE, y permite corregirlo con <b>Snap</b>.</li>
+  <li>Instala <code>grimorio_color-0.7.0.zip</code> con <b>Tools → Scripts → Import Python Plugins</b>, reinicia Krita, actívalo en <b>Settings → Configure Krita → Python Plugin Manager</b> y reinicia otra vez.</li>
   <li>El panel aparece en <b>Settings → Dockers → Color Grimoire</b>.</li>
   <li>Todo se guarda en un JSON local; no hay red ni cuentas. Haz backup con <b>⋯ → Export JSON…</b>.</li>
   <li>La zona Privado está oculta por defecto; no está cifrada.</li>

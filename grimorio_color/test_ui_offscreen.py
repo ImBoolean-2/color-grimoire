@@ -96,7 +96,15 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     assert panel.character_combo.count() == 2, panel.character_combo.count()
-    assert panel.tabs.count() == 4, panel.tabs.count()
+    assert panel.tabs.count() == 5, panel.tabs.count()
+    assert panel.library_scroll is not None
+    assert panel.recipe_preset is not None
+    assert panel.recipe_preset.count() == 3, panel.recipe_preset.count()
+    assert panel.recipe_preset.currentData() == "character", panel.recipe_preset.currentData()
+    assert panel.env_preset is not None
+    assert panel.env_preset.count() == 5, panel.env_preset.count()
+    assert panel.env_select is not None
+    assert panel.env_select.count() == 1, panel.env_select.count()
     assert panel.state["characters"][0]["name"] == "Rowan Vale"
     assert panel.action_lang_en.isChecked() == (panel._language == "en")
     assert panel.action_lang_es.isChecked() == (panel._language == "es")
@@ -172,6 +180,12 @@ def main() -> int:
 
     # Ambiente: editar y guardar
     panel.tabs.setCurrentIndex(3)
+    sunset_index = panel.env_preset.findData("sunset")
+    assert sunset_index >= 0, sunset_index
+    panel.env_preset.setCurrentIndex(sunset_index)
+    panel.apply_environment_preset()
+    assert panel.env_time.text() == "Atardecer", panel.env_time.text()
+    assert panel.env_key.value() == "#ff9a5c", panel.env_key.value()
     panel.env_name.setText("Prueba de ambiente")
     panel.env_time.setText("Noche")
     panel.env_weather.setText("Lluvia")
@@ -213,8 +227,10 @@ def main() -> int:
     character_dialog.name_edit.setText("OC de prueba")
     character_dialog.tags_edit.setText("test, temporal")
     character_dialog.summary_edit.setPlainText("Resumen de prueba")
+    assert character_dialog.kind_combo.count() == 3, character_dialog.kind_combo.count()
     character_data = character_dialog.data()
     assert character_data["name"] == "OC de prueba", character_data
+    assert character_data["kind"] == "character", character_data
     assert character_data["tags"] == ["test", "temporal"], character_data
     character_dialog.show()
     app.processEvents()
@@ -235,6 +251,44 @@ def main() -> int:
     app.processEvents()
     assert layer_dialog.grab().save(str(out_dir / "grimorio-dialog-layer.png"))
     layer_dialog.close()
+
+    # Editor de zonas
+    zone_dialog = ui.ZoneDialog(parent=panel, zones=model.palette_zones(panel._character()))
+    assert len(zone_dialog.zones()) == 8, len(zone_dialog.zones())
+    zone_dialog.add_zone()
+    assert len(zone_dialog.zones()) == 9, len(zone_dialog.zones())
+    assert len(zone_dialog._rows) == 9, len(zone_dialog._rows)
+    zone_dialog.show()
+    app.processEvents()
+    assert zone_dialog.grab().save(str(out_dir / "grimorio-dialog-zones.png"))
+    zone_dialog.close()
+    moved_key = zone_dialog.zones()[0]["key"]
+    zone_dialog.move_zone(0, "down")
+    assert zone_dialog.zones()[1]["key"] == moved_key, zone_dialog.zones()
+    zone_dialog.delete_zone(0)
+    assert len(zone_dialog.zones()) == 8, len(zone_dialog.zones())
+    while len(zone_dialog.zones()) > 1:
+        zone_dialog.delete_zone(0)
+    zone_dialog.delete_zone(0)
+    assert len(zone_dialog.zones()) == 1, len(zone_dialog.zones())
+
+    # Biblioteca: paleta global y refresco del tab
+    assert panel.tabs.count() == 5, panel.tabs.count()
+    palette = model.add_library_palette(panel.state, "Prueba", [])
+    panel.refresh()
+    app.processEvents()
+    assert len(panel.state["library"]) == 1, panel.state["library"]
+    assert panel.library_zone.count() == 8, panel.library_zone.count()
+    panel.library_name.setText("Prueba de zona")
+    panel.add_library_from_zone()
+    app.processEvents()
+    assert len(panel.state["library"]) == 2, panel.state["library"]
+    panel.tabs.setCurrentIndex(4)
+    app.processEvents()
+    assert panel.grab().save(str(out_dir / "grimorio-panel-biblioteca.png"))
+    model.delete_library_palette(panel.state, palette["id"])
+    panel.refresh()
+    app.processEvents()
 
     # Foto del OC y ejemplo de zona.
     image_path = Path(_TEMP_DIR.name) / "sample.png"
@@ -294,6 +348,20 @@ def main() -> int:
     assert panel.tabs.tabText(0) == "Sheet", panel.tabs.tabText(0)
     assert panel.findChild(ui.QLabel, "title").text() == "Color Grimoire"
 
+    # Escenario: zonas de escena y ambientes múltiples.
+    panel.set_language("es")
+    scene = model.add_character(panel.state, "Escena", kind="scene")
+    panel.state["activeCharacterId"] = scene["id"]
+    panel.refresh()
+    app.processEvents()
+    assert panel._character()["kind"] == "scene"
+    assert panel.findChild(ui.QLabel, "zone_title_sky") is not None
+    assert panel.env_select.count() == 1
+    panel.add_environment()
+    app.processEvents()
+    assert len(panel._character()["environments"]) == 2
+    assert panel.env_select.count() == 2
+
     print("UI OK")
     for name in (
         "grimorio-panel-ficha.png",
@@ -301,9 +369,11 @@ def main() -> int:
         "grimorio-panel-private.png",
         "grimorio-panel-capas.png",
         "grimorio-panel-ambiente.png",
+        "grimorio-panel-biblioteca.png",
         "grimorio-dialog-swatch.png",
         "grimorio-dialog-oc.png",
         "grimorio-dialog-layer.png",
+        "grimorio-dialog-zones.png",
     ):
         print(str(out_dir / name))
 

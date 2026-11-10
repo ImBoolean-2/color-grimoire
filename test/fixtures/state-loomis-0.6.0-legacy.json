@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "privateMode": true,
+  "activeCharacterId": "oc-loomis",
+  "characters": [
+    {
+      "id": "oc-loomis",
+      "name": "Loomis Legacy",
+      "palettes": {
+        "skin": [
+          {
+            "id": "color-loomis-skin",
+            "name": "Piel base",
+            "hex": "#c98d6b",
+            "role": "base",
+            "bodyPart": "Cara y cuerpo",
+            "purpose": "Plano de piel",
+            "opacity": 100,
+            "note": ""
+          }
+        ],
+        "hair": [],
+        "eyes": [],
+        "outfit": [],
+        "armor": [],
+        "accessories": [],
+        "intimate": [],
+        "scars": []
+      },
+      "recipe": [
+        {"id": "layer-loomis-line", "name": "LINE", "blend": "normal", "opacity": 100, "purpose": "Lineart limpio"},
+        {"id": "layer-loomis-base", "name": "BASE", "blend": "normal", "opacity": 100, "purpose": "Colores planos"},
+        {"id": "layer-loomis-shadow", "name": "SHADOW", "blend": "multiply", "opacity": 45, "purpose": "Sombra general"},
+        {"id": "layer-loomis-ao", "name": "AO", "blend": "multiply", "opacity": 25, "purpose": "Oclusión en grietas"},
+        {"id": "layer-loomis-light", "name": "LIGHT", "blend": "add", "opacity": 30, "purpose": "Luz principal"},
+        {"id": "layer-loomis-glow", "name": "GLOW", "blend": "add", "opacity": 15, "purpose": "Brillo"},
+        {"id": "layer-loomis-fx", "name": "FX", "blend": "overlay", "opacity": 20, "purpose": "Textura / ajuste"}
+      ],
+      "environment": {
+        "name": "Estudio",
+        "time": "Mediodía",
+        "weather": "Despejado",
+        "keyLight": "#fff3d6",
+        "shadowTint": "#5a6a7a",
+        "bounce": "#c9a07a",
+        "mood": "Luz alta y neutra",
+        "palette": []
+      },
+      "head": {
+        "headSex": 1,
+        "browRidge": 0.35,
+        "eyeSocketDepth": 0.45,
+        "eyeSocketSize": 0.6,
+        "showEyeSocket": true,
+        "cheekFullness": 0.65,
+        "lightAzimuth": 45,
+        "lightElevation": 30,
+        "lightIntensity": 0.8,
+        "showShadow": true,
+        "shadowMode": "cast",
+        "futureKey": 123
+      }
+    }
+  ]
+}

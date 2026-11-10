@@ -1,5 +1,68 @@
 # Changelog
 
+## 0.7.0 — 2026-11-10
+
+### Added
+
+- **Zone editor** (web + docker): add, rename label/element, reorder, mark private and delete zones. Deleting a zone keeps its palette as an opaque extra, so colors survive and remain in `.gpl`/counts; the key stays stable.
+- **Palette library**: `library` stores reusable `{id, name, swatches}` palettes. Create from a project zone, import into any zone by copy with new ids, rename and delete. Available as a fifth tab in the web app and the docker.
+- **Fresh migration backup**: if `grimorio.json.v1.bak` already exists but the v1 file changed, a `grimorio.json.v1-<timestamp>.bak` copy is created before migrating. Repeated loads do not duplicate it.
+
+### Changed
+
+- **Upgrade from 0.4.1**: v1 `grimorio.json` files migrate automatically to v2 with a `.v1.bak` (or a timestamped `.v1-<date>.bak` when the standard backup is stale); the web localStorage v1 is backed up as `grimorio-color:v1-backup`. Loomis Head Guide 0.6.1 writes only `character.head` and preserves the v2 fields; both plugins stay independent.
+- **UX pass**: neutral “Proyecto/Project” copy across the web app and docker, compact responsive zone rows, sticky dialog actions, accessible zone-field labels and specific save/import/rename/delete status feedback.
+- `docs/MODELO-DATOS.md` documents the library schema, zone editor/key stability, delete-keeps-palette and the timestamped v1 backup.
+- `docs/WEB.md` documents the zone editor and Biblioteca tab.
+
+### Tested
+
+- 44 model tests, 4 i18n tests, 140 web checks, UI offscreen PyQt5 with ZoneDialog and library controls.
+
+## 0.6.0 — 2026-11-10
+
+### Added
+
+- **Project kinds**: `kind` is `character` (default), `scene` or `prop`. Each kind gets default zones and a starter recipe (character 8 zones/LINE…FX, scene 8 zones/sky…light + SKY…FX, prop 5 zones/LINE…FX). Changing kind keeps the old palettes as hidden opaque zones.
+- **Configurable zones**: `zones` stores `{key, label, defaultBody, private}` per project; scene and prop presets included. Custom zones are rendered by the web app and the docker.
+- **Multiple environments**: `environments` + `activeEnvironmentId` with add, duplicate, delete and switch; `environment` remains a mirror of the active one for v1 readers. Environment swatches edit the active environment and sync the mirror.
+- **Schema v2 migration**: loading a `version: 1` file creates `grimorio.json.v1.bak` once and normalizes to v2 (kind `character`, 8 zones, one environment). The web app stores a one-time `grimorio-color:v1-backup` in localStorage.
+- **Adaptive sheet/print**: character shows history/personality/relationships; scene and prop show summary + active environment. Key-color chips use the first zones of the project.
+- **Dynamic body-part label**: “Parte del cuerpo” for characters, “Elemento” for scenes/props; the JSON key remains `bodyPart`.
+- **Loomis contract**: the opaque `head` block is still deep-copied and survives v2 migration, save/load and export/import; legacy light keys and unknown keys are preserved.
+
+### Changed
+
+- State `version` is now `2`; `library` is reserved as an empty list for 0.7.
+- `docs/MODELO-DATOS.md` documents the v2 schema, zone presets, environments, migration/backup and the Loomis contract.
+- `docs/WEB.md` documents kinds, multiple environments, adaptive sheets and the localStorage backup.
+
+### Tested
+
+- 37 model tests, 4 i18n tests, 106 web checks, UI offscreen PyQt5 with kind/zone/environment controls, and the v1→v2 + Loomis `head` contract.
+
+## 0.5.0 — 2026-11-10
+
+### Added
+
+- **Scene-friendly palettes**: palette keys outside the eight character zones (`sky`, `foliage`, `rocks`…) are preserved as an opaque deep copy in the plugin and the web app; they survive save/load and are included in `.gpl` exports and color counts.
+- **Environment palette in `.gpl`**: the active environment palette is appended with the `Ambiente · <name>` label and counted in the sheet/sidebar totals.
+- **Recipe presets**: Personaje / Entorno / Prop presets (model, web and docker) with confirmation; the existing character recipe remains the default.
+- **Environment presets**: Amanecer / Día / Atardecer / Noche / Niebla fill the environment fields; the docker previews the values without saving until “Guardar ambiente”.
+- **Scene vocabulary**: the swatch field label is now “Elemento / parte del cuerpo” and the datalist includes sky, water, vegetation, terrain, rock, wood, metal, glass, cloth and FX (the JSON key remains `bodyPart`).
+- **Web search**: filter by swatch name, HEX, `bodyPart`, zone label and environment fields.
+- **Print sheet**: environment summary and extra palette zones.
+- **Loomis 0.6.1 compatibility**: the plugin preserves the opaque `head` block written by Loomis Head Guide 0.6.1 (`normalize_character` deep-copies it; new OCs include `"head": {}`), and the web sheet shows `headSex`, `eyeSocketDepth`, `browRidge` and `cheekFullness` with the 0.6.0 fields as fallback. No import of Loomis code; both plugins remain independent.
+
+### Changed
+
+- `docs/MODELO-DATOS.md` documents the opaque palette keys, the environment `.gpl` export and the Loomis 0.6.1 keys/legacy light keys.
+- `docs/WEB.md` documents recipe/environment presets, the extended search and the environment `.gpl` export.
+
+### Tested
+
+- 27 model tests (19 previous + 8 scene/compatibility), 4 i18n tests, 61 web checks, UI offscreen PyQt5 with recipe/environment presets, and the Loomis `head` contract.
+
 ## 0.4.1 — 2026-11-07
 
 ### Added

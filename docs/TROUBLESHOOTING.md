@@ -36,6 +36,21 @@ It needs an active document. Create an image and press again. The stack is creat
 
 It needs an active document and a saved environment. Save the environment first; the rig uses saved values, not the unsaved form. It creates a `Lighting — <scene>` group with SHADOW/AO/LIGHT/GLOW/BOUNCE fill layers and `inheritAlpha`.
 
+## Updating from 0.4.1: backups and restore
+
+Updating from 0.4.1 is automatic. The first load of a `version: 1` JSON writes `grimorio.json.v1.bak` next to it and then converts the file to v2.
+
+- **No `.v1.bak` appears**: check the right data folder (Flatpak and native Linux use different paths), and make sure the JSON really was v1 and not already migrated. If the standard backup already existed and your file had changed since, the new copy is `grimorio.json.v1-<date>.bak`.
+- **Only one backup and then no more**: that is expected; migration runs once. Repeated loads do not duplicate it.
+- **Restore**: close Krita, replace `grimorio.json` with the `.v1.bak` copy (rename it), keep the `images/` folder, reopen Krita. The next load migrates it again.
+- **Downgrade is not supported**: 0.5/0.4 cannot read v2. The backup is the safety net, not a way to keep two versions in parallel.
+- **Web app**: v1 `localStorage` is converted to v2 and a one-time `grimorio-color:v1-backup` key is kept. That backup belongs to that browser only. To move data to another browser or machine, use **Export JSON** in the old one and **Import JSON** in the new one.
+- **Loomis Head Guide**: update both plugins. Save in Loomis first, then in Grimoire; do not save in both at the same time. Grimoire copies the opaque `head` block and never interprets it.
+- **Colors “missing” after deleting a zone**: they are not deleted. Deleting a zone keeps `palettes[key]` as a hidden extra: it still appears in `.gpl` exports and color counts, but not in the zone editor.
+- **Library tab empty**: expected; `library` starts empty and fills only when you use **Create from zone**.
+
+The full step-by-step guide is [`MIGRATION-0.4.1-TO-0.7.0.md`](../MIGRATION-0.4.1-TO-0.7.0.md).
+
 ## The OC photo or zone example does not appear
 
 - The file must exist in `images/` next to the JSON. If you moved the JSON without the folder, paths break and the placeholder shows.

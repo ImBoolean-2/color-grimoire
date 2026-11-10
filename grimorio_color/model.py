@@ -35,6 +35,35 @@ ZONES: list[dict[str, str]] = [
 ZONE_BY_KEY = {zone["key"]: zone for zone in ZONES}
 ZONE_KEYS = [zone["key"] for zone in ZONES]
 
+KINDS: tuple[str, ...] = ("character", "scene", "prop")
+KIND_LABELS: dict[str, str] = {"character": "Personaje", "scene": "Escenario", "prop": "Prop"}
+SCENE_ZONES: list[dict[str, Any]] = [
+    {"key": "sky", "label": "Cielo", "defaultBody": "Cielo", "private": False},
+    {"key": "foliage", "label": "Vegetación", "defaultBody": "Vegetación", "private": False},
+    {"key": "terrain", "label": "Terreno", "defaultBody": "Terreno", "private": False},
+    {"key": "water", "label": "Agua", "defaultBody": "Agua", "private": False},
+    {"key": "architecture", "label": "Arquitectura", "defaultBody": "Arquitectura", "private": False},
+    {"key": "props", "label": "Objetos", "defaultBody": "Objetos", "private": False},
+    {"key": "fx", "label": "Efectos", "defaultBody": "Efectos", "private": False},
+    {"key": "light", "label": "Luz", "defaultBody": "Luz", "private": False},
+]
+PROP_ZONES: list[dict[str, Any]] = [
+    {"key": "base", "label": "Base", "defaultBody": "Base", "private": False},
+    {"key": "shadow", "label": "Sombra", "defaultBody": "Sombra", "private": False},
+    {"key": "light", "label": "Luz", "defaultBody": "Luz", "private": False},
+    {"key": "accent", "label": "Acento", "defaultBody": "Acento", "private": False},
+    {"key": "detail", "label": "Detalle", "defaultBody": "Detalle", "private": False},
+]
+ZONE_PRESETS: dict[str, list[dict[str, Any]]] = {
+    "character": [
+        {"key": z["key"], "label": z["label"], "defaultBody": z["default_body"],
+         "private": z["key"] == "intimate"}
+        for z in ZONES
+    ],
+    "scene": SCENE_ZONES,
+    "prop": PROP_ZONES,
+}
+
 ROLES: dict[str, str] = {
     "base": "Base",
     "shadow": "Sombra",
@@ -90,6 +119,14 @@ BODY_PARTS: list[str] = [
     "Otro",
 ]
 
+SCENERY_BODY_PARTS: list[str] = [
+    "Cielo", "Agua", "Vegetación", "Terreno", "Roca", "Madera",
+    "Metal", "Cristal", "Tela", "FX",
+]
+ALL_BODY_PARTS: list[str] = BODY_PARTS + [
+    part for part in SCENERY_BODY_PARTS if part not in BODY_PARTS
+]
+
 BASE_RECIPE: list[dict[str, Any]] = [
     {"name": "LINE", "blend": "normal", "opacity": 100, "purpose": "Lineart limpio"},
     {"name": "BASE", "blend": "normal", "opacity": 100, "purpose": "Colores planos"},
@@ -100,6 +137,30 @@ BASE_RECIPE: list[dict[str, Any]] = [
     {"name": "FX", "blend": "overlay", "opacity": 20, "purpose": "Textura / ajuste"},
 ]
 
+RECIPE_PRESETS: dict[str, list[dict[str, Any]]] = {
+    "character": BASE_RECIPE,
+    "scene": [
+        {"name": "SKY", "blend": "normal", "opacity": 100, "purpose": "Cielo / fondo lejano"},
+        {"name": "FAR", "blend": "normal", "opacity": 100, "purpose": "Plano lejano"},
+        {"name": "MID", "blend": "normal", "opacity": 100, "purpose": "Plano medio"},
+        {"name": "FG", "blend": "normal", "opacity": 100, "purpose": "Primer plano"},
+        {"name": "ATMO", "blend": "overlay", "opacity": 20, "purpose": "Atmósfera / profundidad"},
+        {"name": "FX", "blend": "overlay", "opacity": 15, "purpose": "Textura / ajuste"},
+    ],
+    "prop": [
+        {"name": "LINE", "blend": "normal", "opacity": 100, "purpose": "Lineart / silueta"},
+        {"name": "BASE", "blend": "normal", "opacity": 100, "purpose": "Colores planos"},
+        {"name": "SHADOW", "blend": "multiply", "opacity": 45, "purpose": "Sombra"},
+        {"name": "LIGHT", "blend": "add", "opacity": 30, "purpose": "Luz"},
+        {"name": "FX", "blend": "overlay", "opacity": 15, "purpose": "Textura / ajuste"},
+    ],
+}
+RECIPE_PRESET_LABELS: dict[str, str] = {
+    "character": "Personaje",
+    "scene": "Entorno",
+    "prop": "Prop",
+}
+
 DEFAULT_ENVIRONMENT: dict[str, Any] = {
     "name": "",
     "time": "",
@@ -109,6 +170,28 @@ DEFAULT_ENVIRONMENT: dict[str, Any] = {
     "bounce": "#7a4a2a",
     "mood": "",
     "palette": [],
+}
+
+ENVIRONMENT_PRESETS: dict[str, dict[str, Any]] = {
+    "dawn": {"name": "Amanecer", "time": "Amanecer", "weather": "Despejado",
+             "keyLight": "#ffd2a1", "shadowTint": "#4a3a5c", "bounce": "#b06a4a",
+             "mood": "Frío en sombra, cálido en luz", "palette": []},
+    "day": {"name": "Día", "time": "Mediodía", "weather": "Despejado",
+            "keyLight": "#fff3d6", "shadowTint": "#5a6a7a", "bounce": "#c9a07a",
+            "mood": "Luz alta y neutra", "palette": []},
+    "sunset": {"name": "Atardecer", "time": "Atardecer", "weather": "Despejado",
+               "keyLight": "#ff9a5c", "shadowTint": "#3a2a5c", "bounce": "#8a4a3a",
+               "mood": "Cálido en luz, frío en sombra", "palette": []},
+    "night": {"name": "Noche", "time": "Noche", "weather": "Despejado",
+              "keyLight": "#9ab8ff", "shadowTint": "#1a1f3a", "bounce": "#3a4a6a",
+              "mood": "Frío, luz de luna", "palette": []},
+    "fog": {"name": "Niebla", "time": "Amanecer", "weather": "Niebla",
+            "keyLight": "#d8d8d0", "shadowTint": "#6a7078", "bounce": "#8a8a80",
+            "mood": "Bajo contraste, aire húmedo", "palette": []},
+}
+ENVIRONMENT_PRESET_LABELS: dict[str, str] = {
+    "dawn": "Amanecer", "day": "Día", "sunset": "Atardecer",
+    "night": "Noche", "fog": "Niebla",
 }
 
 
@@ -201,6 +284,19 @@ def zone_label(zone_key: str) -> str:
     return zone["label"] if zone else "Paleta"
 
 
+def palette_zone_label(zone_key: str, zones: list[dict[str, Any]] | None = None) -> str:
+    if isinstance(zone_key, dict):
+        # Compatibilidad: permite palette_zone_label(character, "sky").
+        character = zone_key
+        zone_key = as_str(zones) if not isinstance(zones, list) else ""
+        zones = palette_zones(character)
+    for zone in zones or []:
+        if zone.get("key") == zone_key:
+            return as_str(zone.get("label")) or zone_key
+    zone = ZONE_BY_KEY.get(zone_key)
+    return zone["label"] if zone else zone_key
+
+
 def default_body_part(zone_key: str) -> str:
     if zone_key == "environment":
         return "Ambiente"
@@ -208,11 +304,25 @@ def default_body_part(zone_key: str) -> str:
     return zone["default_body"] if zone else ""
 
 
-def empty_palettes() -> dict[str, list[dict[str, Any]]]:
-    return {zone_key: [] for zone_key in ZONE_KEYS}
+def empty_palettes(zones: list[dict[str, Any]] | None = None) -> dict[str, list[dict[str, Any]]]:
+    zone_list = zones if isinstance(zones, list) and zones else default_zones("character")
+    return {zone["key"]: [] for zone in zone_list}
 
 
-def make_base_recipe() -> list[dict[str, Any]]:
+def palette_zone_keys(character: dict[str, Any]) -> list[str]:
+    """Claves de paleta visibles: zonas del proyecto (si existen) + extras."""
+    palettes = character.get("palettes", {})
+    keys: list[str] = [zone["key"] for zone in palette_zones(character)]
+    if not isinstance(palettes, dict):
+        return keys
+    for key in palettes:
+        if key not in keys:
+            keys.append(key)
+    return keys
+
+
+def make_recipe(preset: str = "character") -> list[dict[str, Any]]:
+    layers = RECIPE_PRESETS.get(preset, RECIPE_PRESETS["character"])
     return [
         {
             "id": new_id("layer"),
@@ -221,8 +331,12 @@ def make_base_recipe() -> list[dict[str, Any]]:
             "opacity": item["opacity"],
             "purpose": item["purpose"],
         }
-        for item in BASE_RECIPE
+        for item in layers
     ]
+
+
+def make_base_recipe() -> list[dict[str, Any]]:
+    return make_recipe("character")
 
 
 def default_environment() -> dict[str, Any]:
@@ -231,11 +345,151 @@ def default_environment() -> dict[str, Any]:
     return env
 
 
-def normalize_swatch(raw: Any, zone_key: str, used_ids: set[str]) -> dict[str, Any]:
+def default_zones(kind: str = "character") -> list[dict[str, Any]]:
+    return [dict(zone) for zone in ZONE_PRESETS.get(kind, ZONE_PRESETS["character"])]
+
+
+def normalize_kind(raw: Any) -> str:
+    kind = as_str(raw).lower()
+    return kind if kind in ZONE_PRESETS else "character"
+
+
+def normalize_zones(raw: Any, kind: str) -> list[dict[str, Any]]:
+    defaults = default_zones(kind)
+    if not isinstance(raw, list):
+        return defaults
+    result: list[dict[str, Any]] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        key = as_str(item.get("key"))
+        if not key or any(zone["key"] == key for zone in result):
+            continue
+        private = item.get("private")
+        if not isinstance(private, bool):
+            private = key == "intimate"
+        result.append({
+            "key": key,
+            "label": as_str(item.get("label")) or key,
+            "defaultBody": as_str(item.get("defaultBody")) or as_str(item.get("label")) or key,
+            "private": private,
+        })
+    return result or defaults
+
+
+def palette_zones(character: dict[str, Any]) -> list[dict[str, Any]]:
+    zones = character.get("zones")
+    if isinstance(zones, list):
+        result: list[dict[str, Any]] = []
+        for zone in zones:
+            if isinstance(zone, dict):
+                key = as_str(zone.get("key"))
+                if key:
+                    result.append({
+                        "key": key,
+                        "label": as_str(zone.get("label")) or key,
+                        "defaultBody": as_str(zone.get("defaultBody")) or key,
+                        "private": bool(zone.get("private", key == "intimate")),
+                    })
+        if result:
+            return result
+    return default_zones("character")
+
+
+def palette_zone_private(character: dict[str, Any], zone_key: str) -> bool:
+    for zone in palette_zones(character):
+        if zone["key"] == zone_key:
+            return bool(zone.get("private", zone_key == "intimate"))
+    return zone_key == "intimate"
+
+
+def _zone_default_body(character: dict[str, Any], zone_key: str) -> str:
+    for zone in palette_zones(character):
+        if zone["key"] == zone_key:
+            return as_str(zone.get("defaultBody")) or default_body_part(zone_key)
+    return default_body_part(zone_key)
+
+
+def _zone_key(value: Any) -> str:
+    text = unicodedata.normalize("NFKD", as_str(value)).encode("ascii", "ignore").decode()
+    text = re.sub(r"[^a-z0-9_-]+", "-", text.lower()).strip("-")
+    return text or "zona"
+
+
+def add_zone(
+    character: dict[str, Any],
+    key: Any,
+    label: str = "",
+    default_body: str = "",
+    private: bool = False,
+) -> dict[str, Any] | None:
+    zones = palette_zones(character)
+    zone_key = _zone_key(key)
+    if any(zone["key"] == zone_key for zone in zones):
+        return None
+    zone = {
+        "key": zone_key,
+        "label": as_str(label) or zone_key,
+        "defaultBody": as_str(default_body) or as_str(label) or zone_key,
+        "private": bool(private),
+    }
+    zones.append(zone)
+    character["zones"] = zones
+    character.setdefault("palettes", {}).setdefault(zone_key, [])
+    return zone
+
+
+def update_zone(character: dict[str, Any], key: str, data: dict[str, Any]) -> dict[str, Any] | None:
+    zones = palette_zones(character)
+    for zone in zones:
+        if zone["key"] != key:
+            continue
+        if "label" in data:
+            zone["label"] = as_str(data.get("label")) or zone["key"]
+        if "defaultBody" in data:
+            zone["defaultBody"] = as_str(data.get("defaultBody")) or zone["label"]
+        if isinstance(data.get("private"), bool):
+            zone["private"] = data["private"]
+        character["zones"] = zones
+        return zone
+    return None
+
+
+def delete_zone(character: dict[str, Any], key: str) -> bool:
+    zones = palette_zones(character)
+    if len(zones) <= 1:
+        return False
+    remaining = [zone for zone in zones if zone["key"] != key]
+    if len(remaining) == len(zones):
+        return False
+    character["zones"] = remaining
+    # La paleta se conserva como extra opaco, no se borra.
+    return True
+
+
+def move_zone(character: dict[str, Any], key: str, direction: str) -> bool:
+    zones = palette_zones(character)
+    index = next((i for i, zone in enumerate(zones) if zone["key"] == key), -1)
+    if index < 0:
+        return False
+    target = index - 1 if direction == "up" else index + 1
+    if target < 0 or target >= len(zones):
+        return False
+    zones[index], zones[target] = zones[target], zones[index]
+    character["zones"] = zones
+    return True
+
+
+def normalize_swatch(
+    raw: Any,
+    zone_key: str,
+    used_ids: set[str],
+    default_body: Any = None,
+) -> dict[str, Any]:
     source = raw if isinstance(raw, dict) else {}
     note = as_str(source.get("note"))
     purpose = as_str(source.get("purpose")) or note
-    body_part = as_str(source.get("bodyPart")) or default_body_part(zone_key)
+    body_part = as_str(source.get("bodyPart")) or as_str(default_body) or default_body_part(zone_key)
     role = as_str(source.get("role"))
     if role not in ROLES:
         role = "base"
@@ -252,6 +506,63 @@ def normalize_swatch(raw: Any, zone_key: str, used_ids: set[str]) -> dict[str, A
     return swatch
 
 
+def normalize_palettes(
+    raw: Any,
+    used_ids: set[str],
+    zones: list[dict[str, Any]] | None = None,
+) -> dict[str, list[dict[str, Any]]]:
+    """Normaliza las zonas del proyecto y conserva como bloque opaco las extra.
+
+    Las zonas desconocidas (custom, legacy) no se interpretan: se copian en
+    profundo para que no se pierdan al guardar desde el Grimorio.
+    """
+    source = raw if isinstance(raw, dict) else {}
+    zone_list = zones if isinstance(zones, list) and zones else default_zones("character")
+    palettes = empty_palettes(zone_list)
+    for zone in zone_list:
+        zone_key = zone["key"]
+        items = source.get(zone_key)
+        if isinstance(items, list):
+            palettes[zone_key] = [
+                normalize_swatch(item, zone_key, used_ids, zone.get("defaultBody"))
+                for item in items
+                if isinstance(item, dict)
+            ]
+    for zone_key, items in source.items():
+        if zone_key in palettes or not isinstance(items, list):
+            continue
+        palettes[zone_key] = _deep_copy(items)
+        for item in items:
+            if isinstance(item, dict):
+                item_id = as_str(item.get("id"))
+                if item_id:
+                    used_ids.add(item_id)
+    return palettes
+
+
+def normalize_library(raw: Any, used_ids: set[str]) -> list[dict[str, Any]]:
+    if not isinstance(raw, list):
+        return []
+    result: list[dict[str, Any]] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        swatches_raw = item.get("swatches")
+        swatches: list[dict[str, Any]] = []
+        if isinstance(swatches_raw, list):
+            swatches = [
+                normalize_swatch(swatch, "library", used_ids, "Otro")
+                for swatch in swatches_raw
+                if isinstance(swatch, dict)
+            ]
+        result.append({
+            "id": _unique_id(used_ids, item.get("id"), "lib"),
+            "name": as_str(item.get("name")) or "Paleta sin nombre",
+            "swatches": swatches,
+        })
+    return result
+
+
 def normalize_layer(raw: Any, used_ids: set[str]) -> dict[str, Any]:
     source = raw if isinstance(raw, dict) else {}
     blend = as_str(source.get("blend"))
@@ -266,6 +577,22 @@ def normalize_layer(raw: Any, used_ids: set[str]) -> dict[str, Any]:
     }
 
 
+def _deep_copy(value: Any) -> Any:
+    return json.loads(json.dumps(value, ensure_ascii=False))
+
+
+def normalize_head(raw: Any) -> dict[str, Any]:
+    """Bloque opaco del generador de cabezas (Loomis): se conserva tal cual.
+
+    El Grimorio no lo interpreta; solo lo guarda para que viaje en el JSON.
+    La copia es profunda para no compartir listas ni diccionarios con el origen
+    y para conservar claves desconocidas o legacy.
+    """
+    if not isinstance(raw, dict):
+        return {}
+    return _deep_copy(raw)
+
+
 def normalize_environment(raw: Any, used_ids: set[str]) -> dict[str, Any]:
     source = raw if isinstance(raw, dict) else {}
     palette_raw = source.get("palette")
@@ -277,6 +604,7 @@ def normalize_environment(raw: Any, used_ids: set[str]) -> dict[str, Any]:
             if isinstance(item, dict)
         ]
     return {
+        "id": _unique_id(used_ids, source.get("id"), "env"),
         "name": as_str(source.get("name")),
         "time": as_str(source.get("time")),
         "weather": as_str(source.get("weather")),
@@ -286,6 +614,232 @@ def normalize_environment(raw: Any, used_ids: set[str]) -> dict[str, Any]:
         "mood": as_str(source.get("mood")),
         "palette": palette,
     }
+
+
+def normalize_environments(
+    source: dict[str, Any],
+    used_ids: set[str],
+) -> tuple[list[dict[str, Any]], str]:
+    raw_list = source.get("environments")
+    environments: list[dict[str, Any]] = []
+    if isinstance(raw_list, list):
+        for item in raw_list:
+            if isinstance(item, dict):
+                environments.append(normalize_environment(item, used_ids))
+    if not environments:
+        legacy = source.get("environment")
+        environments = [normalize_environment(legacy if isinstance(legacy, dict) else {}, used_ids)]
+    else:
+        legacy = source.get("environment")
+        if isinstance(legacy, dict):
+            legacy_id = as_str(legacy.get("id"))
+            known = {env["id"] for env in environments}
+            if legacy_id and legacy_id not in known:
+                environments.append(normalize_environment(legacy, used_ids))
+    active_id = as_str(source.get("activeEnvironmentId"))
+    if not any(env["id"] == active_id for env in environments):
+        active_id = environments[0]["id"]
+    return environments, active_id
+
+
+def active_environment(character: dict[str, Any]) -> dict[str, Any]:
+    environments = character.get("environments")
+    active_id = as_str(character.get("activeEnvironmentId"))
+    if isinstance(environments, list) and environments:
+        for env in environments:
+            if isinstance(env, dict) and env.get("id") == active_id:
+                return env
+        return environments[0]
+    return character.get("environment") or default_environment()
+
+
+def sync_environment_mirror(character: dict[str, Any]) -> None:
+    environment = active_environment(character)
+    if not isinstance(character.get("environments"), list) or not character["environments"]:
+        character["environments"] = [_deep_copy(environment)]
+    environment = active_environment(character)
+    if not as_str(environment.get("id")):
+        environment["id"] = new_id("env")
+    character["activeEnvironmentId"] = environment.get("id")
+    character["environment"] = _deep_copy(environment)
+
+
+def add_environment(
+    character: dict[str, Any],
+    data: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    used_ids = _used_ids(character)
+    environment = normalize_environment(data if isinstance(data, dict) else {}, used_ids)
+    character.setdefault("environments", []).append(environment)
+    character["activeEnvironmentId"] = environment["id"]
+    sync_environment_mirror(character)
+    return environment
+
+
+def duplicate_environment(
+    character: dict[str, Any],
+    environment_id: str | None = None,
+) -> dict[str, Any] | None:
+    source = None
+    for env in character.get("environments", []):
+        if isinstance(env, dict) and (environment_id is None or env.get("id") == environment_id):
+            source = env
+            break
+    if source is None:
+        return None
+    used_ids = _used_ids(character) - {
+        swatch.get("id") for swatch in source.get("palette", []) if isinstance(swatch, dict)
+    }
+    copy = _deep_copy(source)
+    copy["id"] = new_id("env")
+    copy["name"] = (as_str(copy.get("name")) or "Ambiente") + " (copia)"
+    copy = normalize_environment(copy, used_ids)
+    character.setdefault("environments", []).append(copy)
+    character["activeEnvironmentId"] = copy["id"]
+    sync_environment_mirror(character)
+    return copy
+
+
+def delete_environment(character: dict[str, Any], environment_id: str) -> bool:
+    environments = character.get("environments")
+    if not isinstance(environments, list) or len(environments) <= 1:
+        return False
+    before = len(environments)
+    character["environments"] = [
+        env for env in environments
+        if isinstance(env, dict) and env.get("id") != environment_id
+    ]
+    if len(character["environments"]) == before:
+        return False
+    if character.get("activeEnvironmentId") == environment_id:
+        character["activeEnvironmentId"] = character["environments"][0]["id"]
+    sync_environment_mirror(character)
+    return True
+
+
+def set_active_environment(character: dict[str, Any], environment_id: str) -> bool:
+    for env in character.get("environments", []):
+        if isinstance(env, dict) and env.get("id") == environment_id:
+            character["activeEnvironmentId"] = environment_id
+            sync_environment_mirror(character)
+            return True
+    return False
+
+
+def update_environment(
+    character: dict[str, Any],
+    environment_id: str,
+    data: dict[str, Any],
+) -> dict[str, Any] | None:
+    for env in character.get("environments", []):
+        if not isinstance(env, dict) or env.get("id") != environment_id:
+            continue
+        current_ids = {
+            swatch.get("id") for swatch in env.get("palette", []) if isinstance(swatch, dict)
+        }
+        used_ids = _used_ids(character) - current_ids - {environment_id}
+        updated = normalize_environment({**env, **data, "id": environment_id}, used_ids)
+        env.clear()
+        env.update(updated)
+        if character.get("activeEnvironmentId") == environment_id:
+            sync_environment_mirror(character)
+        return env
+    return None
+
+
+def _state_used_ids(state: dict[str, Any]) -> set[str]:
+    used: set[str] = set()
+    for character in state.get("characters", []):
+        if isinstance(character, dict):
+            used |= _used_ids(character)
+    for palette in state.get("library", []):
+        if not isinstance(palette, dict):
+            continue
+        palette_id = as_str(palette.get("id"))
+        if palette_id:
+            used.add(palette_id)
+        for swatch in palette.get("swatches", []):
+            if isinstance(swatch, dict) and swatch.get("id"):
+                used.add(swatch["id"])
+    return used
+
+
+def add_library_palette(state: dict[str, Any], name: str, swatches: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    used = _state_used_ids(state)
+    normalized: list[dict[str, Any]] = []
+    for swatch in swatches or []:
+        if isinstance(swatch, dict):
+            normalized.append(normalize_swatch({**swatch, "id": ""}, "library", used, "Otro"))
+    palette = {
+        "id": _unique_id(used, None, "lib"),
+        "name": as_str(name) or "Paleta sin nombre",
+        "swatches": normalized,
+    }
+    state.setdefault("library", []).append(palette)
+    return palette
+
+
+def library_add_from_zone(
+    state: dict[str, Any],
+    character: dict[str, Any],
+    zone_key: str,
+    name: str | None = None,
+) -> dict[str, Any]:
+    if zone_key == "environment":
+        source = active_environment(character).get("palette", [])
+    else:
+        source = character.get("palettes", {}).get(zone_key, [])
+    label = palette_zone_label(zone_key, palette_zones(character))
+    return add_library_palette(
+        state,
+        name or f"{as_str(character.get('name')) or 'Proyecto'} · {label}",
+        source if isinstance(source, list) else [],
+    )
+
+
+def rename_library_palette(state: dict[str, Any], palette_id: str, name: str) -> dict[str, Any] | None:
+    for palette in state.get("library", []):
+        if isinstance(palette, dict) and palette.get("id") == palette_id:
+            palette["name"] = as_str(name) or "Paleta sin nombre"
+            return palette
+    return None
+
+
+def delete_library_palette(state: dict[str, Any], palette_id: str) -> bool:
+    before = len(state.get("library", []))
+    state["library"] = [
+        palette for palette in state.get("library", [])
+        if not (isinstance(palette, dict) and palette.get("id") == palette_id)
+    ]
+    return len(state["library"]) != before
+
+
+def import_library_palette(
+    character: dict[str, Any],
+    zone_key: str,
+    palette: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Copia una paleta de la biblioteca a una zona, con ids nuevos."""
+    if not isinstance(palette, dict):
+        return []
+    used_ids = _used_ids(character)
+    default_body = _zone_default_body(character, zone_key)
+    if zone_key == "environment":
+        target = active_environment(character).setdefault("palette", [])
+    else:
+        target = character.setdefault(
+            "palettes", empty_palettes(palette_zones(character))
+        ).setdefault(zone_key, [])
+    created: list[dict[str, Any]] = []
+    for swatch in palette.get("swatches", []):
+        if not isinstance(swatch, dict):
+            continue
+        item = normalize_swatch({**swatch, "id": ""}, zone_key, used_ids, default_body)
+        target.append(item)
+        created.append(item)
+    if zone_key == "environment":
+        sync_environment_mirror(character)
+    return created
 
 
 def normalize_image_ref(value: Any) -> str:
@@ -335,17 +889,10 @@ def remove_image(reference: str | None) -> None:
 
 def normalize_character(raw: Any, used_ids: set[str]) -> dict[str, Any]:
     source = raw if isinstance(raw, dict) else {}
-    palettes = empty_palettes()
-    palettes_raw = source.get("palettes")
-    if isinstance(palettes_raw, dict):
-        for zone_key in ZONE_KEYS:
-            items = palettes_raw.get(zone_key)
-            if isinstance(items, list):
-                palettes[zone_key] = [
-                    normalize_swatch(item, zone_key, used_ids)
-                    for item in items
-                    if isinstance(item, dict)
-                ]
+    character_id = _unique_id(used_ids, source.get("id"), "oc")
+    kind = normalize_kind(source.get("kind"))
+    zones = normalize_zones(source.get("zones"), kind)
+    palettes = normalize_palettes(source.get("palettes"), used_ids, zones)
 
     recipe_raw = source.get("recipe")
     recipe = []
@@ -359,13 +906,16 @@ def normalize_character(raw: Any, used_ids: set[str]) -> dict[str, Any]:
     examples_raw = source.get("zoneExamples")
     zone_examples: dict[str, str] = {}
     if isinstance(examples_raw, dict):
-        for zone_key in ZONE_KEYS:
-            reference = normalize_image_ref(examples_raw.get(zone_key))
+        for zone in zones:
+            reference = normalize_image_ref(examples_raw.get(zone["key"]))
             if reference:
-                zone_examples[zone_key] = reference
+                zone_examples[zone["key"]] = reference
+
+    environments, active_id = normalize_environments(source, used_ids)
+    active = next((env for env in environments if env["id"] == active_id), environments[0])
 
     return {
-        "id": _unique_id(used_ids, source.get("id"), "oc"),
+        "id": character_id,
         "name": as_str(source.get("name")) or "Sin nombre",
         "summary": as_str(source.get("summary")),
         "history": as_str(source.get("history")),
@@ -374,14 +924,43 @@ def normalize_character(raw: Any, used_ids: set[str]) -> dict[str, Any]:
         "tags": as_str_list(source.get("tags")),
         "referenceImage": normalize_image_ref(source.get("referenceImage")),
         "zoneExamples": zone_examples,
+        "kind": kind,
+        "zones": zones,
         "palettes": palettes,
         "recipe": recipe,
-        "environment": normalize_environment(source.get("environment"), used_ids),
+        "environment": _deep_copy(active),
+        "environments": environments,
+        "activeEnvironmentId": active_id,
+        "head": normalize_head(source.get("head")),
     }
 
 
+def migrate_state(raw: Any) -> dict[str, Any]:
+    source = _deep_copy(raw) if isinstance(raw, dict) else {}
+    if source.get("version") == 2:
+        return source
+    source["version"] = 2
+    characters = source.get("characters")
+    if isinstance(characters, list):
+        for character in characters:
+            if not isinstance(character, dict):
+                continue
+            kind = normalize_kind(character.get("kind"))
+            character["kind"] = kind
+            if not isinstance(character.get("zones"), list) or not character["zones"]:
+                character["zones"] = default_zones(kind)
+            if not isinstance(character.get("environments"), list) or not character["environments"]:
+                legacy = character.get("environment")
+                character["environments"] = [
+                    _deep_copy(legacy if isinstance(legacy, dict) else default_environment())
+                ]
+            character.setdefault("activeEnvironmentId", "")
+    source.setdefault("library", [])
+    return source
+
+
 def normalize_state(raw: Any) -> dict[str, Any]:
-    source = raw if isinstance(raw, dict) else {}
+    source = migrate_state(raw)
     used_ids: set[str] = set()
     characters = []
     characters_raw = source.get("characters")
@@ -400,20 +979,24 @@ def normalize_state(raw: Any) -> dict[str, Any]:
     if not isinstance(private_mode, bool):
         private_mode = True
 
+    library = normalize_library(source.get("library"), used_ids)
+
     return {
-        "version": 1,
+        "version": 2,
         "privateMode": private_mode,
         "activeCharacterId": active_id,
         "characters": characters,
+        "library": library,
     }
 
 
 def empty_state() -> dict[str, Any]:
     return {
-        "version": 1,
+        "version": 2,
         "privateMode": True,
         "activeCharacterId": None,
         "characters": [],
+        "library": [],
     }
 
 
@@ -438,6 +1021,8 @@ def load_state(path: str | Path | None = None) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError):
         _backup_bad_file(target)
         return seed_state()
+    if isinstance(raw, dict) and raw.get("version") != 2:
+        _backup_before_migration(target)
     return normalize_state(raw)
 
 
@@ -500,7 +1085,12 @@ def add_character(
     name: str,
     summary: str = "",
     tags: list[str] | None = None,
+    kind: str = "character",
 ) -> dict[str, Any]:
+    kind = normalize_kind(kind)
+    zones = default_zones(kind)
+    env = default_environment()
+    env["id"] = new_id("env")
     character = {
         "id": new_id("oc"),
         "name": as_str(name) or "Sin nombre",
@@ -509,9 +1099,14 @@ def add_character(
         "personality": "",
         "relationships": "",
         "tags": as_str_list(tags or []),
-        "palettes": empty_palettes(),
-        "recipe": make_base_recipe(),
-        "environment": default_environment(),
+        "kind": kind,
+        "zones": zones,
+        "palettes": empty_palettes(zones),
+        "recipe": make_recipe(kind),
+        "environment": _deep_copy(env),
+        "environments": [env],
+        "activeEnvironmentId": env["id"],
+        "head": {},
     }
     state.setdefault("characters", []).append(character)
     state["activeCharacterId"] = character["id"]
@@ -535,11 +1130,15 @@ def add_swatch(
     data: dict[str, Any],
 ) -> dict[str, Any]:
     used_ids = _used_ids(character)
-    swatch = normalize_swatch(data, zone_key, used_ids)
+    swatch = normalize_swatch(
+        data, zone_key, used_ids, _zone_default_body(character, zone_key)
+    )
     if zone_key == "environment":
-        character.setdefault("environment", default_environment()).setdefault("palette", []).append(swatch)
+        active_environment(character).setdefault("palette", []).append(swatch)
+        sync_environment_mirror(character)
     else:
-        character.setdefault("palettes", empty_palettes()).setdefault(zone_key, []).append(swatch)
+        zones = palette_zones(character)
+        character.setdefault("palettes", empty_palettes(zones)).setdefault(zone_key, []).append(swatch)
     return swatch
 
 
@@ -554,9 +1153,16 @@ def update_swatch(
         return None
     _, _, current = found
     used_ids = _used_ids(character) - {swatch_id}
-    updated = normalize_swatch({**current, **data, "id": swatch_id}, zone_key, used_ids)
+    updated = normalize_swatch(
+        {**current, **data, "id": swatch_id},
+        zone_key,
+        used_ids,
+        _zone_default_body(character, zone_key),
+    )
     current.clear()
     current.update(updated)
+    if zone_key == "environment":
+        sync_environment_mirror(character)
     return current
 
 
@@ -566,6 +1172,8 @@ def delete_swatch(character: dict[str, Any], zone_key: str, swatch_id: str) -> b
         return False
     items, index, _ = found
     del items[index]
+    if zone_key == "environment":
+        sync_environment_mirror(character)
     return True
 
 
@@ -575,7 +1183,7 @@ def find_swatch(
     swatch_id: str,
 ) -> tuple[list[dict[str, Any]], int, dict[str, Any]] | None:
     if zone_key == "environment":
-        items = character.get("environment", {}).get("palette", [])
+        items = active_environment(character).get("palette", [])
     else:
         items = character.get("palettes", {}).get(zone_key, [])
     for index, swatch in enumerate(items):
@@ -624,21 +1232,34 @@ def move_layer(character: dict[str, Any], layer_id: str, direction: str) -> bool
     return False
 
 
-def reset_recipe(character: dict[str, Any]) -> None:
-    character["recipe"] = make_base_recipe()
+def reset_recipe(character: dict[str, Any], preset: str = "character") -> None:
+    character["recipe"] = make_recipe(preset)
 
 
 def count_colors(character: dict[str, Any]) -> int:
-    palettes = character.get("palettes", {})
-    return sum(len(palettes.get(zone_key, [])) for zone_key in ZONE_KEYS)
+    total = 0
+    for items in (character.get("palettes") or {}).values():
+        if isinstance(items, list):
+            total += len(items)
+    environment = active_environment(character)
+    env_palette = environment.get("palette")
+    if isinstance(env_palette, list):
+        total += len(env_palette)
+    return total
 
 
-def key_colors(character: dict[str, Any]) -> list[str]:
+def key_colors(character: dict[str, Any], include_private: bool = False) -> list[str]:
     result: list[str] = []
-    for zone_key in ("skin", "hair", "eyes"):
-        items = character.get("palettes", {}).get(zone_key, [])
-        if items:
-            result.append(items[0]["hex"])
+    for zone_key in palette_zone_keys(character):
+        if palette_zone_private(character, zone_key) and not include_private:
+            continue
+        items = (character.get("palettes") or {}).get(zone_key, [])
+        if not isinstance(items, list):
+            continue
+        for swatch in items:
+            if isinstance(swatch, dict):
+                result.append(normalize_hex(swatch.get("hex"), "#808080"))
+                break
         if len(result) == 3:
             break
     while len(result) < 3:
@@ -714,7 +1335,7 @@ def delta_e(first: str, second: str) -> float:
 
 def lighting_spec(character: dict[str, Any]) -> list[dict[str, Any]]:
     """Capas del rig de luz, de arriba abajo."""
-    environment = character.get("environment") or {}
+    environment = active_environment(character)
     recipe = {
         as_str(row.get("name")).upper(): row
         for row in character.get("recipe", [])
@@ -737,18 +1358,26 @@ def lighting_spec(character: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
-def scene_preview(character: dict[str, Any], limit: int = 3) -> list[dict[str, str]]:
+def scene_preview(
+    character: dict[str, Any],
+    limit: int = 3,
+    include_private: bool = False,
+) -> list[dict[str, str]]:
     """Colores clave teñidos por la luz del ambiente, para el preview."""
     specs = {item["name"]: item for item in lighting_spec(character)}
     shadow = specs["SHADOW"]
     light = specs["LIGHT"]
     bounce = specs["BOUNCE"]
     rows: list[dict[str, str]] = []
-    for zone_key in ("skin", "hair", "eyes"):
-        items = character.get("palettes", {}).get(zone_key, [])
-        if not items:
+    for zone_key in palette_zone_keys(character):
+        if palette_zone_private(character, zone_key) and not include_private:
             continue
-        swatch = items[0]
+        items = (character.get("palettes") or {}).get(zone_key, [])
+        if not isinstance(items, list) or not items:
+            continue
+        swatch = next((item for item in items if isinstance(item, dict)), None)
+        if swatch is None:
+            continue
         base = normalize_hex(swatch.get("hex"), "#808080")
         rows.append(
             {
@@ -772,30 +1401,55 @@ def nearest_swatch(
 ) -> dict[str, Any] | None:
     target = normalize_hex(hex_value)
     best: dict[str, Any] | None = None
-    for zone in ZONES:
-        if zone["key"] == "intimate" and not include_private:
+    for zone_key in palette_zone_keys(character):
+        if palette_zone_private(character, zone_key) and not include_private:
             continue
-        for swatch in character.get("palettes", {}).get(zone["key"], []):
-            distance = delta_e(target, swatch.get("hex", "#808080"))
+        items = (character.get("palettes") or {}).get(zone_key, [])
+        if not isinstance(items, list):
+            continue
+        for swatch in items:
+            if not isinstance(swatch, dict):
+                continue
+            candidate = normalize_hex(swatch.get("hex"), "#808080")
+            distance = delta_e(target, candidate)
             if best is None or distance < best["delta"]:
-                best = {"swatch": swatch, "zone": zone["key"], "delta": distance}
+                best = {"swatch": swatch, "zone": zone_key, "delta": distance}
     return best
 
 
 def gpl_text(character: dict[str, Any], include_private: bool = False) -> str:
+    zones = palette_zones(character)
     lines = [
         "GIMP Palette",
         f"Name: Grimorio - {gpl_safe(character.get('name', 'OC'))}",
         "Columns: 8",
         "#",
     ]
-    for zone in ZONES:
-        if zone["key"] == "intimate" and not include_private:
+    for zone_key in palette_zone_keys(character):
+        if palette_zone_private(character, zone_key) and not include_private:
             continue
-        for swatch in character.get("palettes", {}).get(zone["key"], []):
-            red, green, blue = hex_to_rgb(swatch.get("hex", "#808080"))
+        items = (character.get("palettes") or {}).get(zone_key, [])
+        if not isinstance(items, list):
+            continue
+        for swatch in items:
+            if not isinstance(swatch, dict):
+                continue
+            hex_value = normalize_hex(swatch.get("hex"), "#808080")
+            red, green, blue = hex_to_rgb(hex_value)
             lines.append(
-                f"{red} {green} {blue}\t{gpl_safe(zone['label'])} · {gpl_safe(swatch.get('name', 'Color'))}"
+                f"{red} {green} {blue}\t{gpl_safe(palette_zone_label(zone_key, zones))} · {gpl_safe(swatch.get('name', 'Color'))}"
+            )
+    environment = active_environment(character)
+    env_palette = environment.get("palette")
+    if isinstance(env_palette, list):
+        env_name = gpl_safe(environment.get("name") or "Ambiente")
+        for swatch in env_palette:
+            if not isinstance(swatch, dict):
+                continue
+            hex_value = normalize_hex(swatch.get("hex"), "#808080")
+            red, green, blue = hex_to_rgb(hex_value)
+            lines.append(
+                f"{red} {green} {blue}\t{gpl_safe('Ambiente · ' + env_name)} · {gpl_safe(swatch.get('name', 'Color'))}"
             )
     return "\n".join(lines) + "\n"
 
@@ -823,17 +1477,68 @@ def _unique_id(used_ids: set[str], preferred: Any, prefix: str) -> str:
 
 def _used_ids(character: dict[str, Any]) -> set[str]:
     used: set[str] = set()
-    for items in character.get("palettes", {}).values():
-        for swatch in items:
-            if swatch.get("id"):
-                used.add(swatch["id"])
-    for swatch in character.get("environment", {}).get("palette", []):
-        if swatch.get("id"):
-            used.add(swatch["id"])
+    palettes = character.get("palettes")
+    if isinstance(palettes, dict):
+        for items in palettes.values():
+            if not isinstance(items, list):
+                continue
+            for swatch in items:
+                if isinstance(swatch, dict) and swatch.get("id"):
+                    used.add(swatch["id"])
+    environments = character.get("environments")
+    if isinstance(environments, list):
+        for environment in environments:
+            if not isinstance(environment, dict):
+                continue
+            if environment.get("id"):
+                used.add(environment["id"])
+            palette = environment.get("palette")
+            if not isinstance(palette, list):
+                continue
+            for swatch in palette:
+                if isinstance(swatch, dict) and swatch.get("id"):
+                    used.add(swatch["id"])
+    mirror = character.get("environment")
+    if isinstance(mirror, dict):
+        palette = mirror.get("palette")
+        if isinstance(palette, list):
+            for swatch in palette:
+                if isinstance(swatch, dict) and swatch.get("id"):
+                    used.add(swatch["id"])
     for layer in character.get("recipe", []):
-        if layer.get("id"):
+        if isinstance(layer, dict) and layer.get("id"):
             used.add(layer["id"])
     return used
+
+
+def _backup_before_migration(path: Path) -> None:
+    standard = path.with_name(path.name + ".v1.bak")
+    try:
+        current = path.read_bytes()
+    except OSError:
+        return
+    if not standard.exists():
+        try:
+            shutil.copy2(path, standard)
+        except OSError:
+            pass
+        return
+    try:
+        if standard.read_bytes() == current:
+            return
+    except OSError:
+        return
+    for candidate in path.parent.glob(path.name + ".v1-*.bak"):
+        try:
+            if candidate.read_bytes() == current:
+                return
+        except OSError:
+            continue
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    try:
+        shutil.copy2(path, path.with_name(f"{path.name}.v1-{stamp}.bak"))
+    except OSError:
+        pass
 
 
 def _backup_bad_file(path: Path) -> None:

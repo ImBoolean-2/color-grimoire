@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "privateMode": true,
+  "activeCharacterId": "oc-custom",
+  "characters": [
+    {
+      "id": "oc-custom",
+      "name": "Custom Zones",
+      "palettes": {
+        "skin": [],
+        "hair": [],
+        "eyes": [],
+        "outfit": [],
+        "armor": [],
+        "accessories": [],
+        "intimate": [],
+        "scars": [],
+        "sky": [
+          {
+            "id": "color-sky",
+            "name": "Cielo",
+            "hex": "#6a8cbf",
+            "role": "base",
+            "bodyPart": "Cielo",
+            "purpose": "Fondo de cielo",
+            "opacity": 100,
+            "note": "",
+            "futureKey": 1
+          }
+        ],
+        "foliage": [
+          {
+            "id": "color-foliage",
+            "name": "Follaje",
+            "hex": "#3f5a3a",
+            "role": "base",
+            "bodyPart": "Vegetación",
+            "purpose": "Masas de vegetación",
+            "opacity": 100,
+            "note": "",
+            "futureKey": 2
+          }
+        ]
+      },
+      "recipe": [
+        {"id": "layer-custom-sky", "name": "SKY", "blend": "normal", "opacity": 100, "purpose": "Cielo / fondo lejano"},
+        {"id": "layer-custom-far", "name": "FAR", "blend": "normal", "opacity": 100, "purpose": "Plano lejano"},
+        {"id": "layer-custom-mid", "name": "MID", "blend": "normal", "opacity": 100, "purpose": "Plano medio"},
+        {"id": "layer-custom-fg", "name": "FG", "blend": "normal", "opacity": 100, "purpose": "Primer plano"},
+        {"id": "layer-custom-atmo", "name": "ATMO", "blend": "overlay", "opacity": 20, "purpose": "Atmósfera / profundidad"},
+        {"id": "layer-custom-fx", "name": "FX", "blend": "overlay", "opacity": 15, "purpose": "Textura / ajuste"}
+      ],
+      "environment": {
+        "name": "Bosque",
+        "time": "Atardecer",
+        "weather": "Despejado",
+        "keyLight": "#ff9a5c",
+        "shadowTint": "#3a2a5c",
+        "bounce": "#8a4a3a",
+        "mood": "Cálido en luz, frío en sombra",
+        "palette": [
+          {
+            "id": "color-env-sky",
+            "name": "Cielo ambiente",
+            "hex": "#6a8cbf",
+            "role": "base",
+            "bodyPart": "Ambiente",
+            "purpose": "Cielo del plano",
+            "opacity": 100,
+            "note": ""
+          }
+        ]
+      }
+    }
+  ]
+}

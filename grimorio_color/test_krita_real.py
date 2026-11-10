@@ -5,7 +5,7 @@
 
 Ejecutar:
     flatpak run --env=QT_QPA_PLATFORM=offscreen --env=QT_QPA_PLATFORMTHEME= \
-      --env=PYTHONPATH=/home/valentino/proyectos/grimorio-color/plugin/grimorio_color \
+      --env=PYTHONPATH=$PWD/plugin/grimorio_color \
       --command=kritarunner org.kde.krita --script test_krita_real -f main
 """
 

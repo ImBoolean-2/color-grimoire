@@ -1,26 +1,33 @@
 # Color Grimoire
 
-A Krita docker for keeping your OCs' colors, body-part notes, layer recipes and environment palettes in one place.
+A Krita docker for keeping the colors of your characters, scenes and props, their body-part notes, layer recipes and environment palettes in one place.
 
 ![Color Grimoire demo](screenshots/demo.gif)
 
-Color Grimoire is the missing character sheet inside Krita: pick an OC, see every color with its purpose and body part, click a swatch to set the foreground color, and create the layer stack with the right blend modes in one action.
+Color Grimoire is the missing art sheet inside Krita: pick a project, see every color with its purpose and element, click a swatch to set the foreground color, and create the layer stack with the right blend modes in one action.
+
+> **Updating from 0.4.1?** Read the step-by-step guide: [MIGRATION-0.4.1-TO-0.7.0.md](MIGRATION-0.4.1-TO-0.7.0.md). It takes five minutes and nothing is deleted: the plugin makes its own backup.
 
 ## Features
 
-- **OC sheets**: name, three-line summary, history, personality, relationships and tags.
-- **Optional OC photo**: add, change or remove a reference photo; it is copied to the local `images/` folder and shown in the sheet hero.
+- **Project sheets**: name, three-line summary, history, personality, relationships and tags for characters.
+- **Optional project photo**: add, change or remove a reference photo; it is copied to the local `images/` folder and shown in the sheet hero.
 - **Optional zone examples**: add a painted crop per zone (hair base/shadow, skin, etc.) with the `▣` button.
 - **Color ramps**: each zone shows an automatic shadow → base → light gradient.
-- **Eight palette zones**: skin, hair, eyes, clothing, armor, accessories, private and marks/scars.
-- **Useful swatches**: name, HEX, role (base/shadow/light/accent/detail), body part, purpose, opacity and a free note.
+- **Character, scene and prop projects**: each type starts with its own zones and layer recipe (8 character zones, 8 scene zones, 5 prop zones).
+- **Configurable zones**: add, rename, reorder, mark private and delete zones. Deleting a zone keeps its colors as a hidden extra, so nothing is lost.
+- **Palette library**: save any zone as a reusable palette and import it into another project by copy, with new ids.
+- **Adaptive sheet and print**: characters show history, personality and relationships; scenes and props show a summary and the active environment.
+- **Useful swatches**: name, HEX, role (base/shadow/light/accent/detail), body part or element, purpose, opacity and a free note.
 - **One-click color**: left click = foreground, right click = background; optional swatch alpha.
 - **Layer recipe**: order, blend mode (Multiply, Add, Screen, Overlay, Soft Light, Color Dodge, Burn, Linear Burn…), opacity and purpose.
 - **Create layers in Krita**: builds a group with the recipe, its blend modes and opacities in the active document.
+- **Multiple environments**: several lighting setups per project, with one active; the v1 `environment` field stays as a mirror for older readers.
 - **Environment**: scene name, time, weather, mood, key light, shadow tint, bounce and an environment palette.
+- **Automatic v1 → v2 migration**: an old `grimorio.json` is upgraded on first load with a `.v1.bak` copy next to it; the web app keeps a `grimorio-color:v1-backup` copy.
 - **Scene preview**: the key skin, hair and eye colors tinted by the scene's key light, shadow and bounce; click a chip to use it.
 - **Create lighting rig**: a group of fill layers with SHADOW (Multiply), AO (Multiply), LIGHT (Add), GLOW (Add) and BOUNCE (Add), using the environment colors and the recipe opacities. The group inherits alpha to clip to the layers below.
-- **Color Guard**: compares the current foreground color with the active OC's palette, shows the nearest swatch and ΔE, and offers **Snap** to correct it.
+- **Color Guard**: compares the current foreground color with the active project's palette, shows the nearest swatch and ΔE, and offers **Snap** to correct it.
 - **Private zone**: hidden by default with a “Show private” toggle. The data is local; it is not encrypted.
 - **JSON + `.gpl`**: export/import the whole library and export a GIMP palette for Krita's Palette Docker.
 - **Spanish / English UI**: follows the system language; switch any time in `⋯ → Language`.
@@ -32,7 +39,7 @@ Color Grimoire is the missing character sheet inside Krita: pick an OC, see ever
 
 ### Recommended: ZIP via Krita
 
-1. Download `grimorio_color-0.4.1.zip` from the Releases page.
+1. Download `grimorio_color-0.7.0.zip` from the Releases page.
 2. In Krita: **Tools → Scripts → Import Python Plugins**, select the ZIP.
 3. Restart Krita.
 4. **Settings → Configure Krita → Python Plugin Manager**: enable **Color Grimoire**.
@@ -57,7 +64,7 @@ The script detects the Flatpak (`~/.var/app/org.kde.krita/data/krita/pykrita`) a
 
 | Color dialog | OC dialog |
 | --- | --- |
-| ![Color dialog](screenshots/dialog-color.png) | ![OC dialog](screenshots/dialog-oc.png) |
+| ![Color dialog](screenshots/dialog-color.png) | ![Project dialog](screenshots/dialog-oc.png) |
 
 ## How it works
 
@@ -100,17 +107,17 @@ No network access, no accounts, no telemetry. The plugin only reads and writes t
 | Krita | Qt | Status |
 | --- | --- | --- |
 | 5.3.4.1 | Qt 5 / PyQt5 | Supported; model, bridge, translation and UI tests pass. Full real re-run pending (Krita open locks the resource database). |
-| 6.0.4.1 | Qt 6 / PyQt6 | Full real test: layer stack, all blend IDs and the lighting rig. The 0.3.0 UI/entry is tested with the real Krita API. |
+| 6.0.4.1 | Qt 6 / PyQt6 | Full real test: layer stack, all blend IDs and the lighting rig. The 0.7.0 UI/entry is tested with the real Krita API. |
 
 The plugin is pure Python and ships no binaries. Windows and macOS use the same ZIP and the same JSON format, but they have not been tested yet. If you try them, please open an issue with the Krita version and the error from the Python Plugin Manager.
 
 ## Development
 
-The runtime is a PyKrita docker with a pure-Python model. Tests:
+The runtime is a PyKrita docker with a pure-Python model. Tests: 44 model checks, 4 i18n checks and 140 web checks.
 
 ```bash
-# Pure model (no Krita, no Qt)
-python3 -m unittest test_model.py -v
+# Pure model and translations (no Krita, no Qt)
+python3 -m unittest test_model.py test_i18n.py -v
 
 # UI offscreen with PyQt5 (Krita 5.3 Flatpak Python) or PyQt6
 flatpak run --command=python3 org.kde.krita test_ui_offscreen.py
@@ -128,6 +135,8 @@ The real API test runs on Krita 6.0.4.1 and verifies the layer group order, all 
 
 ## Documentation
 
+- [Migration guide 0.4.1 → 0.7.0](MIGRATION-0.4.1-TO-0.7.0.md)
+- [Release notes 0.7.0](docs/RELEASE_NOTES_0.7.0.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Data model](docs/DATA-MODEL.md)
 - [Development and testing](docs/DEVELOPMENT.md)
@@ -144,7 +153,7 @@ The end-user manual is [`grimorio_color/Manual.html`](grimorio_color/Manual.html
 - **Create lighting rig** creates fill layers, not a painted scene; use them as a color wash and paint masks on top.
 - The **Scene preview** is a reference; it is not a full color-managed simulation.
 - **Color Guard** uses a fixed ΔE threshold of 3; treat it as a guide, not an absolute color-management check.
-- The **OC photo** and **zone examples** are local files in `images/`; the JSON alone does not carry them. Back up both.
+- The **project photo** and **zone examples** are local files in `images/`; the JSON alone does not carry them. Back up both.
 - **Custom translations** fall back to Spanish for missing or empty values.
 - Palette export is `.gpl`; native `.kpl` (ZIP + XML) is a roadmap item.
 - No cloud sync or sharing; the JSON is a local file.
@@ -159,16 +168,21 @@ GPL-3.0-or-later. See [LICENSE](LICENSE).
 
 ## Español
 
-**Color Grimoire** es un docker de Krita para guardar los colores de cada OC, la parte del cuerpo, para qué sirve cada color, su opacidad, la receta de capas y la paleta del ambiente. Clic = color de primer plano; clic derecho = fondo.
+**Color Grimoire** es un docker de Krita para guardar los colores de cada personaje, escenario o prop, la parte del cuerpo o elemento, para qué sirve cada color, su opacidad, la receta de capas y la paleta del ambiente. Clic = color de primer plano; clic derecho = fondo.
 
+- **Tipos de proyecto**: personaje, escenario y prop, cada uno con sus zonas y receta iniciales.
+- **Editor de zonas**: añadir, renombrar, reordenar, marcar privada y eliminar. Al eliminar, la paleta se conserva como extra oculta.
+- **Biblioteca de paletas**: guarda una zona y vuelve a importarla en otro proyecto por copia, con ids nuevos.
+- **Varios ambientes** por proyecto, con uno activo; la ficha y la impresión se adaptan al tipo.
+- **Migración automática**: un `grimorio.json` de 0.4.1 se convierte al cargar y deja `grimorio.json.v1.bak`. Guía: [MIGRATION-0.4.1-TO-0.7.0.md](MIGRATION-0.4.1-TO-0.7.0.md).
 - **Botón web**: abre el Grimorio web en el navegador; ruta local o URL configurable.
-- **Foto opcional del OC**: se copia a `images/` y se muestra en la ficha.
+- **Foto opcional del proyecto**: se copia a `images/` y se muestra en la ficha.
 - **Ejemplo opcional por zona**: un recorte de referencia para pelo, piel, etc.; botón `▣`.
 - **Rampas de color**: cada zona muestra una barra sombra → base → luz.
 - **Traducciones propias**: archivos JSON en `translations/`; el menú crea la plantilla, abre la carpeta y recarga.
 - **Vista de escena**: los colores clave teñidos por la luz, la sombra y el rebote del ambiente.
 - **Crear luces en Krita**: un grupo de capas de relleno con SHADOW (Multiply), AO (Multiply), LIGHT (Add), GLOW (Add) y BOUNCE (Add).
-- **Color Guard**: compara el color actual con la paleta del OC, muestra el más cercano y el ΔE, y permite corregirlo con **Snap**.
+- **Color Guard**: compara el color actual con la paleta del proyecto, muestra el más cercano y el ΔE, y permite corregirlo con **Snap**.
 - Instala el ZIP con **Tools → Scripts → Import Python Plugins**, reinicia Krita, actívalo en **Settings → Configure Krita → Python Plugin Manager** y reinicia otra vez.
 - El panel aparece en **Settings → Dockers → Color Grimoire**.
 - Todo se guarda en un JSON local; no hay red ni cuentas. Haz backup con **⋯ → Export JSON…**.

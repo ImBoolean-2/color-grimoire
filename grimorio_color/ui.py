@@ -781,14 +781,14 @@ class GrimorioDialog(QDialog):
         row.addWidget(close, 0)
         return box
 
-    def button_row(self) -> QHBoxLayout:
+    def button_row(self, save_text: str | None = None) -> QHBoxLayout:
         row = QHBoxLayout()
         row.setSpacing(8)
         row.addStretch(1)
         cancel = QPushButton(tr("Cancelar"))
         cancel.setObjectName("dialog_cancel")
         cancel.clicked.connect(self.reject)
-        save = QPushButton(tr("Guardar"))
+        save = QPushButton(save_text or tr("Guardar"))
         save.setObjectName("dialog_save")
         save.setDefault(True)
         save.clicked.connect(self.accept)
@@ -804,11 +804,13 @@ class SwatchDialog(GrimorioDialog):
         swatch: dict | None = None,
         environment: bool = False,
         default_body: str = "",
+        kind: str = "character",
     ):
         title = tr("color de ambiente") if environment else tr("color")
         super().__init__((tr("Editar ") if swatch else tr("Añadir ")) + title, parent)
         self.environment = environment
         self.default_body = default_body
+        self.kind = kind
         source = swatch or {}
 
         hex_value = model.normalize_hex(source.get("hex", "#c98d6b"), "#c98d6b")
@@ -841,7 +843,7 @@ class SwatchDialog(GrimorioDialog):
 
         self.body_combo = QComboBox()
         self.body_combo.setEditable(True)
-        self.body_combo.addItems([tr(part) for part in model.BODY_PARTS])
+        self.body_combo.addItems([tr(part) for part in model.ALL_BODY_PARTS])
         self.body_combo.setCurrentText(
             tr(str(source.get("bodyPart") or default_body or model.default_body_part("skin")))
         )
@@ -878,7 +880,8 @@ class SwatchDialog(GrimorioDialog):
         form.addRow(tr("Nombre"), self.name_edit)
         form.addRow(tr("HEX"), hex_row)
         form.addRow(tr("Rol"), self.role_combo)
-        form.addRow(tr("Parte del cuerpo"), self.body_combo)
+        label = tr("Parte del cuerpo") if kind == "character" else tr("Elemento")
+        form.addRow(label, self.body_combo)
         form.addRow(tr("Para qué"), self.purpose_edit)
         form.addRow(tr("Opacidad"), opacity_row)
         form.addRow(tr("Nota"), self.note_edit)
@@ -949,13 +952,207 @@ class SwatchDialog(GrimorioDialog):
         return data
 
 
+class ZoneDialog(GrimorioDialog):
+    """Editor de zonas: etiqueta, elemento por defecto y privacidad."""
+
+    def __init__(self, parent=None, zones: list[dict] | None = None):
+        super().__init__(tr("Editar zonas"), parent)
+        self._zones = [dict(zone) for zone in zones or []]
+        self._rows: list[dict] = []
+
+        self._column_header = QWidget()
+        header_row = QHBoxLayout(self._column_header)
+        header_row.setContentsMargins(10, 0, 10, 0)
+        header_row.setSpacing(6)
+        label_header = QLabel(tr("Etiqueta"))
+        label_header.setObjectName("field_label")
+        element_header = QLabel(tr("Elemento"))
+        element_header.setObjectName("field_label")
+        self._actions_header = QLabel(tr("Acciones"))
+        self._actions_header.setObjectName("field_label")
+        self._actions_header.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        header_row.addWidget(label_header, 1)
+        header_row.addWidget(element_header, 1)
+        header_row.addWidget(self._actions_header)
+
+        self._scroll = QScrollArea()
+        self._scroll.setWidgetResizable(True)
+        self._scroll.setFrameShape(FrameShape.NoFrame)
+        self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        body = QWidget()
+        body.setObjectName("scroll_body")
+        self._rows_layout = QVBoxLayout(body)
+        self._rows_layout.setContentsMargins(2, 2, 2, 2)
+        self._rows_layout.setSpacing(6)
+        self._rows_layout.setAlignment(Qt.AlignTop)
+        self._scroll.setWidget(body)
+
+        add_button = QPushButton(tr("Añadir zona"))
+        add_button.setObjectName("btn_add_zone")
+        add_button.clicked.connect(self.add_zone)
+
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(14, 14, 14, 12)
+        outer.setSpacing(10)
+        outer.addWidget(self.header())
+        outer.addWidget(self._column_header)
+        outer.addWidget(self._scroll, 1)
+        outer.addWidget(add_button)
+        outer.addLayout(self.button_row(tr("Guardar zonas")))
+
+        self.resize(560, 520)
+        self._render_rows()
+
+    def _render_rows(self) -> None:
+        clear_layout(self._rows_layout)
+        self._rows = []
+        for index, zone in enumerate(self._zones):
+            key = str(zone.get("key") or "")
+            frame = QFrame()
+            frame.setObjectName("layer_row")
+            row = QHBoxLayout(frame)
+            row.setContentsMargins(8, 6, 8, 6)
+            row.setSpacing(6)
+
+            label_edit = QLineEdit(str(zone.get("label") or ""))
+            label_edit.setObjectName(f"zone_label_{key}")
+            label_edit.setPlaceholderText(tr("Nombre"))
+            label_edit.setAccessibleName(tr("Etiqueta"))
+            label_edit.setMinimumWidth(96)
+            body_edit = QLineEdit(str(zone.get("defaultBody") or ""))
+            body_edit.setObjectName(f"zone_body_{key}")
+            body_edit.setPlaceholderText(tr("Elemento"))
+            body_edit.setAccessibleName(tr("Elemento"))
+            body_edit.setMinimumWidth(96)
+            private_check = QCheckBox(tr("Privada"))
+            private_check.setObjectName(f"zone_private_{key}")
+            private_check.setAccessibleName(tr("Privada"))
+            private_check.setChecked(bool(zone.get("private", key == "intimate")))
+
+            up = make_small_button("↑", f"btn_zone_up_{key}", tr("Subir zona"))
+            down = make_small_button("↓", f"btn_zone_down_{key}", tr("Bajar zona"))
+            delete = QPushButton(tr("Eliminar"))
+            delete.setObjectName(f"btn_zone_delete_{key}")
+            delete.setProperty("small", "true")
+            delete.setProperty("danger", "true")
+            delete.setFixedHeight(22)
+
+            up.clicked.connect(lambda checked=False, i=index: self.move_zone(i, "up"))
+            down.clicked.connect(lambda checked=False, i=index: self.move_zone(i, "down"))
+            delete.clicked.connect(lambda checked=False, i=index: self.delete_zone(i))
+
+            row.addWidget(label_edit, 1)
+            row.addWidget(body_edit, 1)
+            row.addWidget(private_check)
+            row.addWidget(up)
+            row.addWidget(down)
+            row.addWidget(delete)
+            self._rows_layout.addWidget(frame)
+            self._rows.append(
+                {
+                    "key": key,
+                    "label_edit": label_edit,
+                    "body_edit": body_edit,
+                    "private_check": private_check,
+                    "up": up,
+                    "down": down,
+                    "delete": delete,
+                }
+            )
+        self._rows_layout.addStretch(1)
+        if self._rows:
+            first = self._rows[0]
+            actions_width = (
+                first["private_check"].sizeHint().width()
+                + first["up"].sizeHint().width()
+                + first["down"].sizeHint().width()
+                + first["delete"].sizeHint().width()
+                + 4 * 6
+            )
+            self._actions_header.setMinimumWidth(actions_width)
+        QTimer.singleShot(0, self._sync_column_width)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._sync_column_width()
+
+    def _sync_column_width(self) -> None:
+        scroll = getattr(self, "_scroll", None)
+        header = getattr(self, "_column_header", None)
+        if scroll is None or header is None:
+            return
+        width = scroll.viewport().width()
+        if width > 0:
+            header.setFixedWidth(width)
+
+    def _sync_rows(self) -> None:
+        for index, row in enumerate(self._rows):
+            if index >= len(self._zones):
+                break
+            zone = self._zones[index]
+            zone["key"] = row["key"]
+            zone["label"] = row["label_edit"].text().strip()
+            zone["defaultBody"] = row["body_edit"].text().strip()
+            zone["private"] = bool(row["private_check"].isChecked())
+
+    def add_zone(self) -> None:
+        self._sync_rows()
+        base = model._zone_key("Zona")
+        used = {str(zone.get("key") or "") for zone in self._zones}
+        key = base
+        suffix = 2
+        while key in used:
+            key = f"{base}-{suffix}"
+            suffix += 1
+        self._zones.append(
+            {"key": key, "label": "Zona", "defaultBody": "Zona", "private": False}
+        )
+        self._render_rows()
+
+    def move_zone(self, index: int, direction: str) -> None:
+        self._sync_rows()
+        target = index - 1 if direction == "up" else index + 1
+        if index < 0 or index >= len(self._zones) or target < 0 or target >= len(self._zones):
+            return
+        self._zones[index], self._zones[target] = self._zones[target], self._zones[index]
+        self._render_rows()
+
+    def delete_zone(self, index: int) -> None:
+        self._sync_rows()
+        if len(self._zones) <= 1 or index < 0 or index >= len(self._zones):
+            return
+        self._zones.pop(index)
+        self._render_rows()
+
+    def zones(self) -> list[dict]:
+        self._sync_rows()
+        return [dict(zone) for zone in self._zones]
+
+    def accept(self) -> None:
+        self._sync_rows()
+        if not self._zones:
+            QMessageBox.warning(
+                self, tr("Editar zonas"), tr("Debe haber al menos una zona.")
+            )
+            return
+        for zone in self._zones:
+            if not str(zone.get("label") or "").strip():
+                QMessageBox.warning(
+                    self,
+                    tr("Editar zonas"),
+                    tr("Cada zona necesita una etiqueta."),
+                )
+                return
+        super().accept()
+
+
 class CharacterDialog(GrimorioDialog):
     def __init__(self, parent=None, character: dict | None = None):
-        super().__init__(tr("Editar OC") if character else tr("Nuevo OC"), parent)
+        super().__init__(tr("Editar proyecto") if character else tr("Nuevo proyecto"), parent)
         source = character or {}
 
         self.name_edit = QLineEdit(str(source.get("name") or ""))
-        self.name_edit.setPlaceholderText(tr("Nombre del OC"))
+        self.name_edit.setPlaceholderText(tr("Nombre del proyecto"))
         self.name_edit.setCursorPosition(0)
         self.tags_edit = QLineEdit(", ".join(source.get("tags") or []))
         self.tags_edit.setPlaceholderText(tr("fantasía, guerrera, guardia"))
@@ -965,10 +1162,17 @@ class CharacterDialog(GrimorioDialog):
         self.personality_edit = self._text_edit(str(source.get("personality") or ""), 70)
         self.relationships_edit = self._text_edit(str(source.get("relationships") or ""), 70)
 
+        self.kind_combo = QComboBox()
+        for key, label in model.KIND_LABELS.items():
+            self.kind_combo.addItem(tr(label), key)
+        kind_index = self.kind_combo.findData(source.get("kind", "character"))
+        self.kind_combo.setCurrentIndex(kind_index if kind_index >= 0 else 0)
+
         form = QFormLayout()
         form.setHorizontalSpacing(10)
         form.setVerticalSpacing(7)
         form.addRow(tr("Nombre"), self.name_edit)
+        form.addRow(tr("Tipo"), self.kind_combo)
         form.addRow(tr("Etiquetas"), self.tags_edit)
         form.addRow(tr("Resumen"), self.summary_edit)
         form.addRow(tr("Historia"), self.history_edit)
@@ -983,7 +1187,7 @@ class CharacterDialog(GrimorioDialog):
         outer.addStretch(1)
         outer.addLayout(self.button_row())
 
-        self.resize(440, 580)
+        self.resize(440, 610)
         self.name_edit.setFocus()
 
     @staticmethod
@@ -996,7 +1200,9 @@ class CharacterDialog(GrimorioDialog):
 
     def accept(self) -> None:
         if not self.name_edit.text().strip():
-            QMessageBox.warning(self, tr("Falta el nombre"), tr("El OC necesita un nombre."))
+            QMessageBox.warning(
+                self, tr("Falta el nombre"), tr("El proyecto necesita un nombre.")
+            )
             self.name_edit.setFocus()
             return
         super().accept()
@@ -1004,6 +1210,7 @@ class CharacterDialog(GrimorioDialog):
     def data(self) -> dict:
         return {
             "name": self.name_edit.text().strip(),
+            "kind": self.kind_combo.currentData() or "character",
             "tags": model.as_str_list([part for part in self.tags_edit.text().split(",")]),
             "summary": self.summary_edit.toPlainText().strip(),
             "history": self.history_edit.toPlainText().strip(),
@@ -1163,10 +1370,12 @@ class GrimorioPanel(QWidget):
         self.palettes_scroll, self.palettes_body = self._make_scroll_tab()
         self.layers_scroll, self.layers_body = self._make_scroll_tab()
         self.environment_scroll, self.environment_body = self._make_scroll_tab()
+        self.library_scroll, self.library_body = self._make_scroll_tab()
         self.tabs.addTab(self.sheet_scroll, tr("Ficha"))
         self.tabs.addTab(self.palettes_scroll, tr("Paletas"))
         self.tabs.addTab(self.layers_scroll, tr("Capas"))
         self.tabs.addTab(self.environment_scroll, tr("Ambiente"))
+        self.tabs.addTab(self.library_scroll, tr("Biblioteca"))
         layout.addWidget(self.tabs, 1)
 
         layout.addWidget(self._build_footer())
@@ -1182,7 +1391,7 @@ class GrimorioPanel(QWidget):
         titles.setSpacing(1)
         title = QLabel(tr("Grimorio de Color"))
         title.setObjectName("title")
-        subtitle = QLabel(tr("Paletas y recetas de tus OCs"))
+        subtitle = QLabel(tr("Paletas y recetas de tus proyectos"))
         subtitle.setObjectName("subtitle")
         titles.addWidget(title)
         titles.addWidget(subtitle)
@@ -1274,7 +1483,7 @@ class GrimorioPanel(QWidget):
         row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(4)
 
-        label = QLabel(tr("OC"))
+        label = QLabel(tr("Proyecto"))
         label.setObjectName("field_label")
         row.addWidget(label)
 
@@ -1289,7 +1498,7 @@ class GrimorioPanel(QWidget):
         self.btn_new_character.setObjectName("btn_new_character")
         self.btn_new_character.setProperty("small", "true")
         self.btn_new_character.setFixedSize(26, 26)
-        self.btn_new_character.setToolTip(tr("Nuevo OC"))
+        self.btn_new_character.setToolTip(tr("Nuevo proyecto"))
         self.btn_new_character.setCursor(Qt.PointingHandCursor)
         self.btn_new_character.clicked.connect(self.new_character)
         row.addWidget(self.btn_new_character)
@@ -1298,7 +1507,7 @@ class GrimorioPanel(QWidget):
         self.btn_edit_character.setObjectName("btn_edit_character")
         self.btn_edit_character.setProperty("small", "true")
         self.btn_edit_character.setFixedHeight(26)
-        self.btn_edit_character.setToolTip(tr("Editar la ficha del OC"))
+        self.btn_edit_character.setToolTip(tr("Editar la ficha del proyecto"))
         self.btn_edit_character.clicked.connect(self.edit_character)
         row.addWidget(self.btn_edit_character)
 
@@ -1307,7 +1516,7 @@ class GrimorioPanel(QWidget):
         self.btn_delete_character.setProperty("small", "true")
         self.btn_delete_character.setProperty("danger", "true")
         self.btn_delete_character.setFixedHeight(26)
-        self.btn_delete_character.setToolTip(tr("Eliminar el OC"))
+        self.btn_delete_character.setToolTip(tr("Eliminar el proyecto"))
         self.btn_delete_character.clicked.connect(self.delete_character)
         row.addWidget(self.btn_delete_character)
 
@@ -1417,6 +1626,7 @@ class GrimorioPanel(QWidget):
             self.palettes_scroll,
             self.layers_scroll,
             self.environment_scroll,
+            self.library_scroll,
         )
         positions = [
             scroll.verticalScrollBar().value() if same_character else 0 for scroll in scrolls
@@ -1431,6 +1641,7 @@ class GrimorioPanel(QWidget):
             self._fill_palettes(character)
             self._fill_layers(character)
             self._fill_environment(character)
+            self._fill_library(character)
 
             has_character = character is not None
             self.btn_edit_character.setEnabled(has_character)
@@ -1467,7 +1678,14 @@ class GrimorioPanel(QWidget):
 
     def _fill_key_strip(self, character: dict | None) -> None:
         colors = model.key_colors(character) if character else ["#3a3440"] * 3
-        labels = (tr("Piel"), tr("Pelo"), tr("Ojos"))
+        if character:
+            zones = model.palette_zones(character)
+            labels = tuple(
+                tr(model.palette_zone_label(zone["key"], zones)) for zone in zones[:3]
+            )
+            labels = (labels + (tr("Piel"), tr("Pelo"), tr("Ojos")))[:3]
+        else:
+            labels = (tr("Piel"), tr("Pelo"), tr("Ojos"))
         for button, label, color in zip(self.key_buttons, labels, colors):
             button.set_color(color)
             button.setEnabled(character is not None)
@@ -1485,7 +1703,7 @@ class GrimorioPanel(QWidget):
         if character is None:
             self._add_placeholder(
                 self.sheet_body,
-                tr("Todavía no hay OCs. Crea uno con el botón + de la cabecera."),
+                tr("Todavía no hay proyectos. Crea uno con el botón + de la cabecera."),
             )
             self.sheet_body.addStretch(1)
             return
@@ -1578,13 +1796,28 @@ class GrimorioPanel(QWidget):
         hero.addLayout(info, 1)
         self.sheet_body.addWidget(top)
 
-        cards = (
-            (tr("RESUMEN"), "summary"),
-            (tr("HISTORIA"), "history"),
-            (tr("PERSONALIDAD"), "personality"),
-            (tr("RELACIONES"), "relationships"),
-        )
-        for title, key in cards:
+        cards = [(tr("RESUMEN"), str(character.get("summary") or ""))]
+        if model.normalize_kind(character.get("kind")) == "character":
+            cards += [
+                (tr("HISTORIA"), str(character.get("history") or "")),
+                (tr("PERSONALIDAD"), str(character.get("personality") or "")),
+                (tr("RELACIONES"), str(character.get("relationships") or "")),
+            ]
+        else:
+            env = model.active_environment(character)
+            ambient = " · ".join(
+                filter(
+                    None,
+                    [
+                        str(env.get("name") or ""),
+                        str(env.get("time") or ""),
+                        str(env.get("weather") or ""),
+                        str(env.get("mood") or ""),
+                    ],
+                )
+            )
+            cards.append((tr("AMBIENTE"), ambient or "—"))
+        for title, value in cards:
             card = QFrame()
             card.setObjectName("card")
             card_layout = QVBoxLayout(card)
@@ -1593,8 +1826,7 @@ class GrimorioPanel(QWidget):
             heading = QLabel(title)
             heading.setObjectName("card_title")
             card_layout.addWidget(heading)
-            value = str(character.get(key) or "").strip()
-            body = QLabel(value or "—")
+            body = QLabel(value.strip() or "—")
             body.setObjectName("card_body")
             body.setWordWrap(True)
             body.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -1616,14 +1848,25 @@ class GrimorioPanel(QWidget):
         if character is None:
             self._add_placeholder(
                 self.palettes_body,
-                tr("Crea un OC para empezar a guardar sus paletas por zona."),
+                tr("Crea un proyecto para empezar a guardar sus paletas por zona."),
             )
             self.palettes_body.addStretch(1)
             return
 
+        edit_zones = QPushButton(tr("Editar zonas"))
+        edit_zones.setObjectName("btn_edit_zones")
+        edit_zones.clicked.connect(self.edit_zones)
+        zones_row = QHBoxLayout()
+        zones_row.setContentsMargins(0, 0, 0, 0)
+        zones_row.setSpacing(6)
+        zones_row.addWidget(edit_zones)
+        zones_row.addStretch(1)
+        self.palettes_body.addLayout(zones_row)
+
         private_mode = bool(self.state.get("privateMode", True))
-        for zone in model.ZONES:
+        for zone in model.palette_zones(character):
             zone_key = zone["key"]
+            private = bool(zone.get("private", zone_key == "intimate"))
             items = character.get("palettes", {}).get(zone_key, [])
             block = QFrame()
             block.setObjectName("zone_block")
@@ -1636,7 +1879,7 @@ class GrimorioPanel(QWidget):
             header.setSpacing(6)
             title = QLabel(f"{tr(zone['label'])} ({len(items)})")
             title.setObjectName(f"zone_title_{zone_key}")
-            title.setToolTip(tr(str(zone.get("default_body", ""))))
+            title.setToolTip(tr(str(zone.get("defaultBody", ""))))
             header.addWidget(title, 1)
 
             add_button = QPushButton(tr("Añadir"))
@@ -1656,7 +1899,7 @@ class GrimorioPanel(QWidget):
             example_button.clicked.connect(
                 lambda checked=False, z=zone_key: self.set_zone_example(z)
             )
-            if zone_key == "intimate":
+            if private:
                 toggle = QCheckBox(tr("Mostrar privado"))
                 toggle.setObjectName("private_toggle")
                 toggle.setChecked(not private_mode)
@@ -1666,7 +1909,7 @@ class GrimorioPanel(QWidget):
             header.addWidget(add_button)
             block_layout.addLayout(header)
 
-            hidden = zone_key == "intimate" and private_mode
+            hidden = private and private_mode
             if hidden:
                 add_button.setVisible(False)
                 example_button.setVisible(False)
@@ -1748,6 +1991,25 @@ class GrimorioPanel(QWidget):
             self.palettes_body.addWidget(block)
 
         self.palettes_body.addStretch(1)
+
+    def edit_zones(self) -> None:
+        character = self._character()
+        if character is None:
+            return
+        dialog = ZoneDialog(self, model.palette_zones(character))
+        try:
+            if exec_dialog(dialog) != DialogCode.Accepted:
+                return
+            zones = dialog.zones()
+        finally:
+            dialog.deleteLater()
+        character["zones"] = zones
+        character.setdefault("palettes", {})
+        for zone in zones:
+            character["palettes"].setdefault(zone["key"], [])
+        if self._save():
+            self._set_status(tr("Zonas guardadas"))
+        self.refresh()
 
     @staticmethod
     def _zone_ramp(items: list[dict]) -> list[str] | None:
@@ -1870,7 +2132,7 @@ class GrimorioPanel(QWidget):
         if character is None:
             self._add_placeholder(
                 self.layers_body,
-                tr("Crea un OC para definir su receta de capas."),
+                tr("Crea un proyecto para definir su receta de capas."),
             )
             self.layers_body.addStretch(1)
             return
@@ -1898,6 +2160,22 @@ class GrimorioPanel(QWidget):
         first_row.addWidget(reset_button)
         first_row.addStretch(1)
         self.layers_body.addLayout(first_row)
+
+        preset_row = QHBoxLayout()
+        preset_row.setContentsMargins(0, 0, 0, 0)
+        preset_row.setSpacing(6)
+        self.recipe_preset = QComboBox()
+        self.recipe_preset.setObjectName("recipe_preset")
+        for key, label in model.RECIPE_PRESET_LABELS.items():
+            self.recipe_preset.addItem(tr(label), key)
+        apply_preset = QPushButton(tr("Aplicar receta"))
+        apply_preset.setObjectName("btn_apply_recipe")
+        apply_preset.setProperty("small", "true")
+        apply_preset.setFixedHeight(24)
+        apply_preset.clicked.connect(self.apply_recipe_preset)
+        preset_row.addWidget(self.recipe_preset, 1)
+        preset_row.addWidget(apply_preset)
+        self.layers_body.addLayout(preset_row)
 
         create_button = QPushButton(tr("Crear capas en Krita"))
         create_button.setObjectName("btn_create_layers")
@@ -2001,12 +2279,12 @@ class GrimorioPanel(QWidget):
         if character is None:
             self._add_placeholder(
                 self.environment_body,
-                tr("Crea un OC para describir la luz y la paleta de su ambiente."),
+                tr("Crea un proyecto para describir la luz y la paleta de su ambiente."),
             )
             self.environment_body.addStretch(1)
             return
 
-        environment = character.get("environment") or model.default_environment()
+        environment = model.active_environment(character)
         card = QFrame()
         card.setObjectName("card")
         card_layout = QVBoxLayout(card)
@@ -2016,6 +2294,49 @@ class GrimorioPanel(QWidget):
         title = QLabel(tr("AMBIENTE"))
         title.setObjectName("card_title")
         card_layout.addWidget(title)
+
+        header_row = QHBoxLayout()
+        header_row.setContentsMargins(0, 0, 0, 0)
+        header_row.setSpacing(6)
+        self.env_select = QComboBox()
+        self.env_select.setObjectName("env_select")
+        self.env_select.blockSignals(True)
+        for env in character.get("environments", []):
+            self.env_select.addItem(
+                str(env.get("name") or tr("Ambiente sin nombre")), env.get("id")
+            )
+        active_id = character.get("activeEnvironmentId")
+        index = self.env_select.findData(active_id)
+        self.env_select.setCurrentIndex(index if index >= 0 else 0)
+        self.env_select.currentIndexChanged.connect(self.select_environment)
+        self.env_select.blockSignals(False)
+        add_env = QPushButton(tr("Añadir ambiente"))
+        add_env.clicked.connect(self.add_environment)
+        dup_env = QPushButton(tr("Duplicar"))
+        dup_env.clicked.connect(self.duplicate_environment)
+        del_env = QPushButton(tr("Eliminar"))
+        del_env.setProperty("danger", "true")
+        del_env.clicked.connect(self.delete_environment)
+        header_row.addWidget(self.env_select, 1)
+        header_row.addWidget(add_env)
+        header_row.addWidget(dup_env)
+        header_row.addWidget(del_env)
+        card_layout.addLayout(header_row)
+
+        preset_row = QHBoxLayout()
+        preset_row.setContentsMargins(0, 0, 0, 0)
+        preset_row.setSpacing(6)
+        self.env_preset = QComboBox()
+        self.env_preset.setObjectName("env_preset")
+        for key, label in model.ENVIRONMENT_PRESET_LABELS.items():
+            self.env_preset.addItem(tr(label), key)
+        apply_preset = QPushButton(tr("Aplicar preset"))
+        apply_preset.setObjectName("btn_apply_env_preset")
+        apply_preset.setFixedHeight(24)
+        apply_preset.clicked.connect(self.apply_environment_preset)
+        preset_row.addWidget(self.env_preset, 1)
+        preset_row.addWidget(apply_preset)
+        card_layout.addLayout(preset_row)
 
         grid = QGridLayout()
         grid.setContentsMargins(0, 0, 0, 0)
@@ -2142,6 +2463,217 @@ class GrimorioPanel(QWidget):
 
         self.environment_body.addStretch(1)
 
+    def _fill_library(self, character: dict | None) -> None:
+        clear_layout(self.library_body)
+
+        title = QLabel(tr("Biblioteca").upper())
+        title.setObjectName("card_title")
+        self.library_body.addWidget(title)
+        hint = QLabel(tr("Paletas reutilizables; se importan por copia."))
+        hint.setObjectName("hint")
+        hint.setWordWrap(True)
+        self.library_body.addWidget(hint)
+
+        zones = model.palette_zones(character) if character is not None else []
+        has_character = character is not None
+
+        create_card = QFrame()
+        create_card.setObjectName("card")
+        create_layout = QVBoxLayout(create_card)
+        create_layout.setContentsMargins(10, 9, 10, 10)
+        create_layout.setSpacing(6)
+        create_title = QLabel(tr("Crear desde zona"))
+        create_title.setObjectName("field_label")
+        create_layout.addWidget(create_title)
+
+        self.library_zone = QComboBox()
+        self.library_zone.setObjectName("library_zone")
+        for zone in zones:
+            self.library_zone.addItem(tr(zone["label"]), zone["key"])
+        self.library_name = QLineEdit()
+        self.library_name.setObjectName("library_name")
+        self.library_name.setPlaceholderText(tr("Cielo de atardecer"))
+        save_zone = QPushButton(tr("Guardar zona en biblioteca"))
+        save_zone.setObjectName("btn_library_from_zone")
+        save_zone.clicked.connect(self.add_library_from_zone)
+        create_row = QHBoxLayout()
+        create_row.setContentsMargins(0, 0, 0, 0)
+        create_row.setSpacing(6)
+        create_row.addWidget(self.library_zone, 1)
+        create_row.addWidget(self.library_name, 1)
+        create_layout.addLayout(create_row)
+        create_layout.addWidget(save_zone)
+
+        self.library_zone.setEnabled(has_character)
+        self.library_name.setEnabled(has_character)
+        save_zone.setEnabled(has_character)
+        self.library_body.addWidget(create_card)
+
+        library = [
+            palette for palette in self.state.get("library", []) if isinstance(palette, dict)
+        ]
+        if not library:
+            empty = QLabel(tr("No hay paletas en la biblioteca."))
+            empty.setObjectName("empty_note")
+            empty.setWordWrap(True)
+            self.library_body.addWidget(empty)
+        for palette in library:
+            self.library_body.addWidget(self._library_card(palette, zones, has_character))
+
+        self.library_body.addStretch(1)
+
+    def _library_card(self, palette: dict, zones: list[dict], has_character: bool) -> QFrame:
+        palette_id = str(palette.get("id") or "")
+        swatches = [
+            swatch for swatch in palette.get("swatches", []) if isinstance(swatch, dict)
+        ]
+        card = QFrame()
+        card.setObjectName("card")
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(10, 9, 10, 10)
+        layout.setSpacing(6)
+
+        head = QHBoxLayout()
+        head.setContentsMargins(0, 0, 0, 0)
+        head.setSpacing(6)
+        name = QLabel(str(palette.get("name") or tr("Paleta sin nombre")))
+        name.setObjectName("swatch_name")
+        name.setWordWrap(True)
+        head.addWidget(name, 1)
+        count = QLabel(f"{len(swatches)}{tr(' colores')}")
+        count.setObjectName("hint")
+        head.addWidget(count, 0, Qt.AlignTop)
+        layout.addLayout(head)
+
+        chips = QHBoxLayout()
+        chips.setContentsMargins(0, 0, 0, 0)
+        chips.setSpacing(3)
+        for swatch in swatches[:8]:
+            hex_value = model.normalize_hex(swatch.get("hex"), "#808080")
+            chip = QLabel()
+            chip.setFixedSize(14, 14)
+            chip.setToolTip(f"{swatch.get('name') or tr('Sin nombre')} · {hex_value}")
+            chip.setStyleSheet(
+                f"background-color: {hex_value};"
+                " border: 1px solid #3a3440; border-radius: 3px;"
+            )
+            chips.addWidget(chip)
+        chips.addStretch(1)
+        layout.addLayout(chips)
+
+        actions = QHBoxLayout()
+        actions.setContentsMargins(0, 0, 0, 0)
+        actions.setSpacing(6)
+        zone_combo = QComboBox()
+        zone_combo.setObjectName(f"library_zone_{palette_id}")
+        for zone in zones:
+            zone_combo.addItem(tr(zone["label"]), zone["key"])
+        zone_combo.setEnabled(has_character and zone_combo.count() > 0)
+        layout.addWidget(zone_combo)
+
+        import_button = QPushButton(tr("Importar"))
+        import_button.setObjectName(f"btn_library_import_{palette_id}")
+        import_button.setEnabled(has_character and zone_combo.count() > 0)
+        import_button.clicked.connect(
+            lambda checked=False, pid=palette_id, combo=zone_combo: self.import_library_palette(
+                pid, str(combo.currentData() or "")
+            )
+        )
+        rename_button = QPushButton(tr("Renombrar"))
+        rename_button.setObjectName(f"btn_library_rename_{palette_id}")
+        rename_button.clicked.connect(
+            lambda checked=False, pid=palette_id: self.rename_library_palette(pid)
+        )
+        delete_button = QPushButton(tr("Eliminar"))
+        delete_button.setObjectName(f"btn_library_delete_{palette_id}")
+        delete_button.setProperty("danger", "true")
+        delete_button.clicked.connect(
+            lambda checked=False, pid=palette_id: self.delete_library_palette(pid)
+        )
+        actions.addWidget(import_button, 1)
+        actions.addWidget(rename_button, 1)
+        actions.addWidget(delete_button, 1)
+        layout.addLayout(actions)
+        return card
+
+    def add_library_from_zone(self) -> None:
+        character = self._character()
+        if character is None:
+            return
+        zone_key = str(self.library_zone.currentData() or "")
+        name = self.library_name.text().strip()
+        model.library_add_from_zone(self.state, character, zone_key, name or None)
+        if self._save():
+            self._set_status(tr("Paleta guardada en la biblioteca"))
+        self.refresh()
+
+    def import_library_palette(self, palette_id: str, zone_key: str) -> None:
+        character = self._character()
+        if character is None or not zone_key:
+            return
+        palette = next(
+            (
+                item
+                for item in self.state.get("library", [])
+                if isinstance(item, dict) and item.get("id") == palette_id
+            ),
+            None,
+        )
+        if palette is None:
+            return
+        model.import_library_palette(character, zone_key, palette)
+        if self._save():
+            self._set_status(tr("Paleta importada"))
+        self.refresh()
+
+    def rename_library_palette(self, palette_id: str) -> None:
+        palette = next(
+            (
+                item
+                for item in self.state.get("library", [])
+                if isinstance(item, dict) and item.get("id") == palette_id
+            ),
+            None,
+        )
+        if palette is None:
+            return
+        value, ok = QInputDialog.getText(
+            self,
+            tr("Renombrar paleta"),
+            tr("Nombre"),
+            text=str(palette.get("name") or ""),
+        )
+        if ok and value.strip():
+            model.rename_library_palette(self.state, palette_id, value.strip())
+            if self._save():
+                self._set_status(tr("Paleta renombrada"))
+            self.refresh()
+
+    def delete_library_palette(self, palette_id: str) -> None:
+        palette = next(
+            (
+                item
+                for item in self.state.get("library", [])
+                if isinstance(item, dict) and item.get("id") == palette_id
+            ),
+            None,
+        )
+        if palette is None:
+            return
+        answer = QMessageBox.question(
+            self,
+            tr("Eliminar paleta"),
+            f"¿Eliminar «{palette.get('name') or tr('Sin nombre')}»?",
+            MsgBox.Yes | MsgBox.No,
+            MsgBox.No,
+        )
+        if answer != MsgBox.Yes:
+            return
+        model.delete_library_palette(self.state, palette_id)
+        if self._save():
+            self._set_status(tr("Paleta eliminada"))
+        self.refresh()
+
     def _add_placeholder(self, layout, text: str) -> None:
         card = QFrame()
         card.setObjectName("card")
@@ -2174,7 +2706,7 @@ class GrimorioPanel(QWidget):
             dialog.deleteLater()
 
         character = model.add_character(
-            self.state, data["name"], data["summary"], data["tags"]
+            self.state, data["name"], data["summary"], data["tags"], data["kind"]
         )
         character["history"] = data["history"]
         character["personality"] = data["personality"]
@@ -2194,6 +2726,25 @@ class GrimorioPanel(QWidget):
         finally:
             dialog.deleteLater()
 
+        old_kind = model.normalize_kind(character.get("kind"))
+        new_kind = model.normalize_kind(data["kind"])
+        if old_kind != new_kind:
+            answer = QMessageBox.question(
+                self,
+                tr("Cambiar tipo"),
+                tr("¿Aplicar las zonas y la receta de este tipo? Las paletas actuales se conservan como zonas ocultas.")
+                + f"\n{tr(model.KIND_LABELS.get(new_kind, new_kind))}",
+                MsgBox.Yes | MsgBox.No,
+                MsgBox.No,
+            )
+            if answer == MsgBox.Yes:
+                character["kind"] = new_kind
+                character["zones"] = model.default_zones(new_kind)
+                character["recipe"] = model.make_recipe(new_kind)
+                palettes = character.setdefault("palettes", {})
+                for zone in character["zones"]:
+                    palettes.setdefault(zone["key"], [])
+
         character["name"] = data["name"]
         character["tags"] = data["tags"]
         character["summary"] = data["summary"]
@@ -2207,10 +2758,10 @@ class GrimorioPanel(QWidget):
         character = self._character()
         if character is None:
             return
-        name = str(character.get("name") or tr("este OC"))
+        name = str(character.get("name") or tr("este proyecto"))
         answer = QMessageBox.question(
             self,
-            "Eliminar OC",
+            tr("Eliminar proyecto"),
             f"¿Eliminar «{name}» con todas sus paletas y recetas?",
             MsgBox.Yes | MsgBox.No,
             MsgBox.No,
@@ -2228,7 +2779,7 @@ class GrimorioPanel(QWidget):
             return
         path, _ = QFileDialog.getOpenFileName(
             self,
-            tr("Elegir foto del OC"),
+            tr("Elegir foto del proyecto"),
             str(Path.home()),
             tr("Imágenes (*.png *.jpg *.jpeg *.webp *.bmp)"),
         )
@@ -2237,7 +2788,7 @@ class GrimorioPanel(QWidget):
         try:
             reference = model.store_image(path, "oc")
         except Exception as exc:
-            QMessageBox.critical(self, tr("Foto del OC"), str(exc))
+            QMessageBox.critical(self, tr("Foto del proyecto"), str(exc))
             return
         previous = str(character.get("referenceImage") or "")
         character["referenceImage"] = reference
@@ -2256,7 +2807,7 @@ class GrimorioPanel(QWidget):
         answer = QMessageBox.question(
             self,
             tr("Quitar foto"),
-            tr("¿Quitar la foto del OC?"),
+            tr("¿Quitar la foto del proyecto?"),
             MsgBox.Yes | MsgBox.No,
             MsgBox.No,
         )
@@ -2341,10 +2892,17 @@ class GrimorioPanel(QWidget):
         if character is None:
             return
         environment = zone_key == "environment"
+        zone = next(
+            (z for z in model.palette_zones(character) if z["key"] == zone_key), None
+        )
+        default_body = (zone.get("defaultBody") if zone else "") or model.default_body_part(
+            zone_key
+        )
         dialog = SwatchDialog(
             parent=self,
             environment=environment,
-            default_body=model.default_body_part(zone_key),
+            default_body=default_body,
+            kind=str(character.get("kind") or "character"),
         )
         try:
             if exec_dialog(dialog) != DialogCode.Accepted:
@@ -2365,6 +2923,7 @@ class GrimorioPanel(QWidget):
             parent=self,
             swatch=swatch,
             environment=zone_key == "environment",
+            kind=str(character.get("kind") or "character"),
         )
         try:
             if exec_dialog(dialog) != DialogCode.Accepted:
@@ -2475,6 +3034,25 @@ class GrimorioPanel(QWidget):
         if answer != MsgBox.Yes:
             return
         model.reset_recipe(character)
+        self._save()
+        self.refresh()
+
+    def apply_recipe_preset(self) -> None:
+        character = self._character()
+        if character is None:
+            return
+        preset = self.recipe_preset.currentData() or "character"
+        label = model.RECIPE_PRESET_LABELS.get(preset, preset)
+        answer = QMessageBox.question(
+            self,
+            tr("Aplicar receta"),
+            tr("Se reemplazará la receta actual. ¿Continuar?") + f"\n{tr(label)}",
+            MsgBox.Yes | MsgBox.No,
+            MsgBox.No,
+        )
+        if answer != MsgBox.Yes:
+            return
+        model.reset_recipe(character, preset)
         self._save()
         self.refresh()
 
@@ -2610,17 +3188,88 @@ class GrimorioPanel(QWidget):
                 )
                 field.edit.setFocus()
                 return
-        environment = character.setdefault("environment", model.default_environment())
-        environment["name"] = self.env_name.text().strip()
-        environment["time"] = self.env_time.text().strip()
-        environment["weather"] = self.env_weather.text().strip()
-        environment["mood"] = self.env_mood.text().strip()
-        environment["keyLight"] = self.env_key.value()
-        environment["shadowTint"] = self.env_shadow.value()
-        environment["bounce"] = self.env_bounce.value()
-        environment.setdefault("palette", [])
+        environment = model.active_environment(character)
+        env_id = str(environment.get("id") or "")
+        data = {
+            "name": self.env_name.text().strip(),
+            "time": self.env_time.text().strip(),
+            "weather": self.env_weather.text().strip(),
+            "mood": self.env_mood.text().strip(),
+            "keyLight": self.env_key.value(),
+            "shadowTint": self.env_shadow.value(),
+            "bounce": self.env_bounce.value(),
+        }
+        if not model.update_environment(character, env_id, data):
+            model.add_environment(character, data)
         self._save()
         self.refresh()
+
+    def select_environment(self) -> None:
+        character = self._character()
+        if character is None:
+            return
+        env_id = str(self.env_select.currentData() or "")
+        if model.set_active_environment(character, env_id):
+            self._save()
+            self.refresh()
+
+    def add_environment(self) -> None:
+        character = self._character()
+        if character is None:
+            return
+        count = len(character.get("environments", [])) + 1
+        model.add_environment(character, {"name": f"Ambiente {count}"})
+        self._save()
+        self.refresh()
+
+    def duplicate_environment(self) -> None:
+        character = self._character()
+        if character is None:
+            return
+        env_id = str(self.env_select.currentData() or "")
+        if model.duplicate_environment(character, env_id):
+            self._save()
+            self.refresh()
+
+    def delete_environment(self) -> None:
+        character = self._character()
+        if character is None:
+            return
+        environments = character.get("environments", [])
+        if len(environments) <= 1:
+            QMessageBox.information(
+                self,
+                tr("Eliminar ambiente"),
+                tr("No se puede eliminar el último ambiente."),
+            )
+            return
+        env = model.active_environment(character)
+        answer = QMessageBox.question(
+            self,
+            tr("Eliminar ambiente"),
+            f"¿Eliminar «{env.get('name') or tr('Sin nombre')}»?",
+            MsgBox.Yes | MsgBox.No,
+            MsgBox.No,
+        )
+        if answer != MsgBox.Yes:
+            return
+        if model.delete_environment(character, str(env.get("id") or "")):
+            self._save()
+            self.refresh()
+
+    def apply_environment_preset(self) -> None:
+        preset = self.env_preset.currentData() or "dawn"
+        data = model.ENVIRONMENT_PRESETS.get(preset)
+        if not data:
+            return
+        self.env_name.setText(str(data.get("name") or ""))
+        self.env_time.setText(str(data.get("time") or ""))
+        self.env_weather.setText(str(data.get("weather") or ""))
+        self.env_mood.setText(str(data.get("mood") or ""))
+        self.env_key.set_value(str(data.get("keyLight") or "#ffb36b"))
+        self.env_shadow.set_value(str(data.get("shadowTint") or "#3a2a4d"))
+        self.env_bounce.set_value(str(data.get("bounce") or "#7a4a2a"))
+        self._set_status(tr("Preset aplicado; guarda el ambiente."))
 
     # ------------------------------------------------------------ archivos
     def import_json(self) -> None:

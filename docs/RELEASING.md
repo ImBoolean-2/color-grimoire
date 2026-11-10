@@ -2,18 +2,21 @@
 
 ## Current release
 
-- **0.4.1** public: `https://github.com/ImBoolean-2/color-grimoire`
-- Release: `https://github.com/ImBoolean-2/color-grimoire/releases/tag/v0.4.1`
-- ZIP: `grimorio_color-0.4.1.zip` (includes `grimorio_color/translations/`).
+- **0.7.0** public: `https://github.com/ImBoolean-2/color-grimoire`
+- Release: `https://github.com/ImBoolean-2/color-grimoire/releases/tag/v0.7.0`
+- ZIP: `grimorio_color-0.7.0.zip` (includes `grimorio_color/translations/` and `MIGRATION-0.4.1-TO-0.7.0.md`).
 - The public repository starts at 0.4.1; earlier prototype history is not included.
 
 ## Versioning
 
 Semver `MAJOR.MINOR.PATCH`:
 
+- **0.7.0**: palette library, zone editor, v2 migration, multiple environments.
+- **0.6.0**: schema v2 (`kind`, zones, environments), adaptive sheet.
+- **0.5.0**: scene palettes, recipe/environment presets.
 - **0.4.1**: bundled community translations; clean public repository.
 - **0.4.0**: configurable web companion button.
-- **0.3.0**: OC photos, zone examples, color ramps, user translations.
+- **0.3.0**: project photos, zone examples, color ramps, user translations.
 - **0.2.0**: scene preview, lighting rig, Color Guard, layer order fix.
 - **0.1.0**: MVP; pre-release, do not use.
 
@@ -23,9 +26,9 @@ Semver `MAJOR.MINOR.PATCH`:
 2. **Docs**: `CHANGELOG.md`, `README.md`, `grimorio_color/Manual.html`, `docs/RELEASE_NOTES_<version>.md`, `docs/KRITA_ARTISTS_POST.md`.
 3. **Source**: copy runtime/tests from the development source into `grimorio_color/`; do not hand-edit release copies.
 4. **Translations**: if changed, copy `grimorio_color/translations/`; regenerate `translation-template.json` if source strings changed.
-5. **Tests**: model/i18n (19), bridge (6), UI PyQt5/PyQt6, Krita 5.3/6.0 when possible, web 43 PASS.
+5. **Tests**: model/i18n (44 + 4), bridge (6), UI PyQt5/PyQt6, Krita 5.3/6.0 when possible, web 140 PASS.
 6. **Screenshots/GIF**: regenerate and update `screenshots/`.
-7. **ZIP**: include `grimorio_color/`, `grimorio_color.desktop`, `Manual.html`, `LICENSE`, `README.md` and `translations/`; exclude tests, `__pycache__`, `seed.personal.json`.
+7. **ZIP**: include `grimorio_color/`, `grimorio_color.desktop`, `Manual.html`, `LICENSE`, `README.md`, `CHANGELOG.md`, `MIGRATION-0.4.1-TO-0.7.0.md` and `translations/`; exclude tests, `__pycache__`, `seed.personal.json`.
 8. **Install test**: run `bash install.sh`, restart Krita, enable the plugin, open the docker.
 9. **Public repo**: update the public tree, commit with the GitHub noreply email, push.
 10. **Release**: `gh release create v<version> <zip> --title "Color Grimoire <version>" --notes-file docs/RELEASE_NOTES_<version>.md`.
