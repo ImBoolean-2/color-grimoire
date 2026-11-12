@@ -1,12 +1,15 @@
-# [UPDATE] Color Grimoire 0.7.0 — flexible zones, a palette library and multiple lighting setups
+<!-- Suggested title if you open a new thread:
+[UPDATE] Color Grimoire 0.7.0 — flexible zones, a palette library and multiple lighting setups
+-->
+
+**Download Color Grimoire 0.7.0:**
+[grimorio_color-0.7.0.zip](https://github.com/ImBoolean-2/color-grimoire/releases/download/v0.7.0/grimorio_color-0.7.0.zip) · [Release page and notes](https://github.com/ImBoolean-2/color-grimoire/releases/tag/v0.7.0)
 
 Hi everyone,
 
-I have just published **Color Grimoire 0.7.0**, an update to the free Krita docker I shared here.
+I have just updated **Color Grimoire** to 0.7.0. It is the same free Krita docker I posted before, now built for characters, scenes and props.
 
-Color Grimoire is a small art sheet inside Krita: it keeps the exact colors of a project, what each color is for, the layer recipe (Multiply, Add, Burn, etc.) and the lighting palette in one place. Click a swatch to set the foreground or background color, use Color Guard to check a color against the palette, and create the layer stack or a lighting rig in one action.
-
-**Why 0.7.0?** I originally built it for my OCs. A few artists told me they were using it for scenery, props and color studies. That was the best feedback I could get: the tool should not force a character-shaped project. 0.7.0 makes the project fit the artwork, not the other way around.
+**Why the update?** I originally built it for my OCs. A few artists told me they were using it for scenery, props and color studies. That was the best feedback I could get: the tool should not force a character-shaped project. 0.7.0 makes the project fit the artwork, not the other way around.
 
 ## What's new
 
@@ -37,7 +40,7 @@ If you use **Loomis Head Guide**, update both plugins. Save in Loomis first, the
 
 ## Install (new users)
 
-1. Download `grimorio_color-0.7.0.zip` from the release page.
+1. Download `grimorio_color-0.7.0.zip` from the link above.
 2. Krita → **Tools → Scripts → Import Python Plugins**, select the ZIP.
 3. Restart Krita.
 4. **Settings → Configure Krita → Python Plugin Manager**: enable **Color Grimoire**.
@@ -61,7 +64,7 @@ If you use **Loomis Head Guide**, update both plugins. Save in Loomis first, the
 
 I would love to hear how you use it: do the scene and prop presets cover your work, how do you use the library, should the lighting rig also paint masks or base colors, should Color Guard scan the whole layer instead of the current color, and is a native `.kpl` export the right next step? Bug reports with the Krita version and the Plugin Manager error are especially helpful.
 
-**Download:** https://github.com/ImBoolean-2/color-grimoire/releases/tag/v0.7.0
+**Download:** [grimorio_color-0.7.0.zip](https://github.com/ImBoolean-2/color-grimoire/releases/download/v0.7.0/grimorio_color-0.7.0.zip) · [Release page and notes](https://github.com/ImBoolean-2/color-grimoire/releases/tag/v0.7.0)
 **Full changelog:** https://github.com/ImBoolean-2/color-grimoire/blob/main/CHANGELOG.md
 **License:** GPL-3.0-or-later
 
